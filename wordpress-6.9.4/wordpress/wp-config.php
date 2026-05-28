@@ -89,7 +89,9 @@ define( 'WP_DEBUG', false );
 
 /* Add any custom values between this line and the "stop editing" line. */
 
-
+// WordPress URL Configuration
+define( 'WP_HOME', 'http://localhost/rede_social_MazzaHub/wordpress-6.9.4/wordpress' );
+define( 'WP_SITEURL', 'http://localhost/rede_social_MazzaHub/wordpress-6.9.4/wordpress' );
 
 /* That's all, stop editing! Happy publishing. */
 
