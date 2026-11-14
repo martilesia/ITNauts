@@ -1,0 +1,215 @@
+{
+  "game": {
+    "id": "space-base-commander",
+    "titleTop": "SPACE BASE",
+    "titleBottom": "COMMANDER",
+    "subtitle": "Comando Espacial Educativo",
+    "defaultAudioEnabled": true
+  },
+  "screens": {
+    "initial": {
+      "playButtonLabel": "PLAY",
+      "exitButtonLabel": "EXIT",
+      "audioToggleLabelOn": "Desativar som",
+      "audioToggleLabelOff": "Ativar som",
+      "exitModal": {
+        "title": "Sair do Jogo?",
+        "message": "Tens a certeza de que pretendes sair da missão atual e encerrar a sessão?",
+        "confirmLabel": "Confirmar",
+        "cancelLabel": "Cancelar"
+      },
+      "exitedState": {
+        "title": "Sessão Encerrada",
+        "message": "Obrigado por jogares Space Base Commander. Podes regressar ao ecrã inicial a qualquer momento.",
+        "restartLabel": "Voltar ao Início"
+      }
+    },
+    "personalization": {
+      "title": "Personalização do Comandante",
+      "backButtonLabel": "Voltar ao Início",
+      "randomizeButtonLabel": "Aleatório",
+      "confirmButtonLabel": "Continuar",
+      "tabs": [
+        { "id": "hair", "label": "Cabelo" },
+        { "id": "suit", "label": "Fato Espacial" },
+        { "id": "emblem", "label": "Emblema" },
+        { "id": "gloves", "label": "Luvas" },
+        { "id": "boots", "label": "Botas" },
+        { "id": "accessory", "label": "Amuleto" }
+      ],
+      "options": {
+        "hair": [
+          { "id": "classic", "label": "Clássico", "color": "#E5A93C" },
+          { "id": "braids", "label": "Tranças", "color": "#E5A93C" },
+          { "id": "bob", "label": "Corte Curto", "color": "#D97706" },
+          { "id": "twintails", "label": "Totós", "color": "#F59E0B" },
+          { "id": "buns", "label": "Coques", "color": "#B45309" },
+          { "id": "spiky", "label": "Cadete", "color": "#5B3A29" }
+        ],
+        "suit": [
+          { "id": "azure", "label": "Azul Orbital", "primary": "#1D8FE1", "secondary": "#0F5EA8", "trim": "#F8FAFC" },
+          { "id": "crimson", "label": "Vermelho Marte", "primary": "#DC2626", "secondary": "#991B1B", "trim": "#FEF3C7" },
+          { "id": "emerald", "label": "Verde Bio", "primary": "#10B981", "secondary": "#047857", "trim": "#ECFDF5" },
+          { "id": "violet", "label": "Roxo Nebulosa", "primary": "#7C3AED", "secondary": "#5B21B6", "trim": "#F3E8FF" },
+          { "id": "solar", "label": "Ouro Solar", "primary": "#F59E0B", "secondary": "#B45309", "trim": "#FFFBEB" },
+          { "id": "lunar", "label": "Branco Lunar", "primary": "#64748B", "secondary": "#334155", "trim": "#F8FAFC" }
+        ],
+        "emblem": [
+          { "id": "saturn", "label": "Saturno" },
+          { "id": "rocket", "label": "Foguetão" },
+          { "id": "star", "label": "Estrela" },
+          { "id": "moon", "label": "Lua" },
+          { "id": "bolt", "label": "Energia" },
+          { "id": "atom", "label": "Átomo" }
+        ],
+        "gloves": [
+          { "id": "ice", "label": "Branco Gelo", "color": "#E0F2FE" },
+          { "id": "sky", "label": "Azul Celeste", "color": "#38BDF8" },
+          { "id": "amber", "label": "Ouro", "color": "#FBBF24" },
+          { "id": "rose", "label": "Coral", "color": "#FB7185" },
+          { "id": "mint", "label": "Menta", "color": "#34D399" },
+          { "id": "slate", "label": "Titânio", "color": "#94A3B8" }
+        ],
+        "boots": [
+          { "id": "cobalt", "label": "Cobalto", "color": "#1E40AF" },
+          { "id": "ruby", "label": "Rubi", "color": "#B91C1C" },
+          { "id": "gold", "label": "Dourado", "color": "#D97706" },
+          { "id": "teal", "label": "Turquesa", "color": "#0F766E" },
+          { "id": "plum", "label": "Ametista", "color": "#6D28D9" },
+          { "id": "steel", "label": "Aço", "color": "#475569" }
+        ],
+        "accessory": [
+          { "id": "star_charm", "label": "Estrela" },
+          { "id": "planet_charm", "label": "Mini Planeta" },
+          { "id": "gem_charm", "label": "Cristal" },
+          { "id": "comet_charm", "label": "Cometa" },
+          { "id": "shield_charm", "label": "Escudo" },
+          { "id": "none", "label": "Sem Amuleto" }
+        ]
+      },
+      "defaultCharacter": {
+        "hair": "classic",
+        "suit": "azure",
+        "emblem": "saturn",
+        "gloves": "ice",
+        "boots": "cobalt",
+        "accessory": "star_charm"
+      }
+    },
+    "destination": {
+      "title": "SELEÇÃO DO DESTINO",
+      "subtitle": "Escolhe o corpo celeste para iniciar as tuas experiências científicas.",
+      "backButtonLabel": "Voltar à Personalização",
+      "destinations": [
+        {
+          "id": "moon",
+          "name": "Lua",
+          "planetId": "moon",
+          "gravity": "1,62 m/s²",
+          "distance": "384 400 km",
+          "summary": "Explora crateras lunares e testa a baixa gravidade."
+        },
+        {
+          "id": "mars",
+          "name": "Marte",
+          "planetId": "mars",
+          "gravity": "3,72 m/s²",
+          "distance": "225 M km",
+          "summary": "Analisa o solo avermelhado e a atmosfera rarefeita."
+        }
+      ]
+    },
+    "experiments": {
+      "chapterTitle": "Capítulo 8 — Realizar experiências",
+      "backToDestinationsLabel": "Mudar Destino",
+      "backToTitleLabel": "Menu Inicial",
+      "assistantGreeting": "Escolhe uma experiência numerada abaixo para começar!",
+      "lockedPlanetMessage": "Este planeta será desbloqueado em missões futuras.",
+      "lockedExperimentMessage": "Completa a experiência anterior para desbloquear este nível.",
+      "experimentCompleteLabel": "Experiência Concluída",
+      "continueLabel": "Continuar",
+      "retryLabel": "Tentar Novamente",
+      "closeLabel": "Fechar",
+      "planets": [
+        { "id": "earth", "name": "Terra", "unlockedByDefault": true },
+        { "id": "moon", "name": "Lua", "unlockedByDefault": false },
+        { "id": "mars", "name": "Marte", "unlockedByDefault": false },
+        { "id": "uranus", "name": "Úrano", "unlockedByDefault": false },
+        { "id": "jupiter", "name": "Júpiter", "unlockedByDefault": false }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "title": "Teste de Gravidade",
+          "prompt": "Se largares um martelo e uma pena ao mesmo tempo no vácuo (como na Lua), o que acontece?",
+          "options": [
+            { "id": "a", "text": "O martelo cai muito mais depressa.", "correct": false },
+            { "id": "b", "text": "Ambos atingem o solo exatamente ao mesmo tempo.", "correct": true },
+            { "id": "c", "text": "A pena flutua para cima.", "correct": false }
+          ],
+          "explanation": "Sem resistência do ar, todos os objetos aceleram da mesma forma devido à gravidade!"
+        },
+        {
+          "id": 2,
+          "title": "Pressão e Fato Espacial",
+          "prompt": "Porque é que os astronautas precisam de fatos pressurizados fora da nave?",
+          "options": [
+            { "id": "a", "text": "Para manter oxigénio, pressão e temperatura segura.", "correct": true },
+            { "id": "b", "text": "Apenas para parecerem mais altos.", "correct": false },
+            { "id": "c", "text": "Para aumentar a gravidade da Lua.", "correct": false }
+          ],
+          "explanation": "No vácuo espacial não há ar respirável nem pressão atmosférica para proteger o corpo."
+        },
+        {
+          "id": 3,
+          "title": "Painéis Solares",
+          "prompt": "Qual é a principal fonte de energia que alimenta a nossa estação em órbita?",
+          "options": [
+            { "id": "a", "text": "Energia eólica do vento espacial.", "correct": false },
+            { "id": "b", "text": "Luz solar captada por painéis fotovoltaicos.", "correct": true },
+            { "id": "c", "text": "Água dos oceanos lunares.", "correct": false }
+          ],
+          "explanation": "Os painéis solares convertem a luz do Sol diretamente em eletricidade para a nave."
+        },
+        {
+          "id": 4,
+          "title": "Composição da Atmosfera",
+          "prompt": "Qual é o gás mais abundante na atmosfera da Terra?",
+          "options": [
+            { "id": "a", "text": "Azoto (Nitrogénio)", "correct": true },
+            { "id": "b", "text": "Dióxido de carbono", "correct": false },
+            { "id": "c", "text": "Hélio", "correct": false }
+          ],
+          "explanation": "A atmosfera terrestre é composta por cerca de 78% de azoto e 21% de oxigénio."
+        },
+        {
+          "id": 5,
+          "title": "Solo de Marte",
+          "prompt": "O que dá ao planeta Marte a sua cor avermelhada característica?",
+          "options": [
+            { "id": "a", "text": "Oceanos de lava quente.", "correct": false },
+            { "id": "b", "text": "Óxido de ferro (ferrugem) na poeira e rochas.", "correct": true },
+            { "id": "c", "text": "Reflexo da luz azul da Terra.", "correct": false }
+          ],
+          "explanation": "A superfície marciana é rica em poeira de óxido de ferro, dando-lhe o tom avermelhado."
+        },
+        {
+          "id": 6,
+          "title": "Comunicação por Rádio",
+          "prompt": "A que velocidade viajam os sinais de rádio entre a Terra e a nave espacial?",
+          "options": [
+            { "id": "a", "text": "À velocidade do som.", "correct": false },
+            { "id": "b", "text": "À velocidade da luz.", "correct": true },
+            { "id": "c", "text": "À velocidade de um foguetão.", "correct": false }
+          ],
+          "explanation": "As ondas de rádio são ondas eletromagnéticas e viajam no vácuo à velocidade da luz!"
+        }
+      ]
+    }
+  },
+  "messages": {
+    "loadingConfig": "A carregar configuração da missão...",
+    "configErrorTitle": "Erro ao carregar configuração",
+    "configErrorRetry": "Tentar novamente"
+  }
+}

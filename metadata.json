@@ -1,0 +1,6 @@
+{
+  "name": "Space Base Commander",
+  "description": "Educational space exploration and base command game with stylized arcade interfaces.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
