@@ -1,20 +1,73 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# ITNauts
 
-# Run and deploy your AI Studio app
+## Getting Started
 
-This contains everything you need to run your app locally.
+Follow these instructions to clone, install, and run the application locally.
 
-View your app in AI Studio: https://ai.studio/apps/81421f2d-72ad-4d27-8a3d-0d5ae4b485b2
+### Prerequisites
 
-## Run Locally
+Make sure you have the following installed:
 
-**Prerequisites:**  Node.js
+- [Node.js](https://nodejs.org/)
+- npm (included with Node.js)
+- Git
 
+### Installation
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. Clone the repository:
+
+   ```bash
+   git clone git@github.com:martilesia/ITNauts.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd ITNauts
+   ```
+
+3. Install the compatible esbuild version to resolve the Vite dependency conflict:
+
+   ```bash
+   npm install -D esbuild@^0.28.0
+   ```
+
+4. Install the project dependencies:
+
+   ```bash
+   npm install
+   ```
+
+### Running the Application
+
+This project is built with **React and Vite**.
+
+Start the development server on port **3000**:
+
+```bash
+npm run dev -- --host 0.0.0.0 --port 3000
+```
+
+Access the application at:
+
+```text
+http://localhost:3000
+```
+
+### Building for Production
+
+Generate an optimized production build:
+
+```bash
+npm run build
+```
+
+The generated production files will be available in the `dist/` directory.
+
+### Previewing the Production Build
+
+To preview the production build on port 3000:
+
+```bash
+npm run preview -- --host 0.0.0.0 --port 3000
+```
