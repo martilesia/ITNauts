@@ -125,7 +125,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
       setStep(startImmediately ? 'EXPLORING' : 'BRIEFING');
       if (startImmediately) {
         sayAstro(
-          'Mission restarted! Use the arrow keys or tap the map to drive the rover through the green zones and save battery.',
+          'Mission restarted! Use the arrow keys or tap the map to drive the rover across green zones and save battery.',
           'happy',
           6000
         );
@@ -146,7 +146,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
           setActiveModal(null);
           setStep('RESULTS');
           sayAstro(
-            'Oh no, the rover battery ran out! Next time, avoid the orange slopes and rocks.',
+            'Oh no, the rover battery ran out! Next time, avoid orange slopes and rocks.',
             'alert',
             6000
           );
@@ -155,7 +155,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
           soundEngine.playGentleError();
           setActiveModal({ kind: 'low_battery' });
           sayAstro(
-            'Heads up: low battery! Look for the yellow Solar Point or stay on flat green terrain.',
+            'Warning: low battery! Look for the yellow Solar Point or stay on flat green terrain.',
             'alert',
             6000
           );
@@ -191,7 +191,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
       if (targetTile.zone === 'mountain') {
         soundEngine.playGentleError();
         showFeedback('Mountain too steep! The rover cannot climb here.', 'negative');
-        sayAstro('This brown mountain is too steep! Go around along a lower path.', 'encourage', 4500);
+        sayAstro('This brown mountain is too steep! Go around via a lower path.', 'encourage', 4500);
         return;
       }
 
@@ -262,7 +262,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
         setScore((s) => s + 25);
         applyBatteryChange(25 - cost);
         showFeedback('Solar Point! +25% battery and +25 pts!', 'positive');
-        sayAstro('Nice! You recharged +25% of the rover battery with solar power!', 'happy', 4500);
+        sayAstro('Nice! You recharged +25% of the rover battery using solar power!', 'happy', 4500);
       } else {
         applyBatteryChange(-cost);
       }
@@ -355,7 +355,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
       setScore((s) => s + 20);
       setActiveModal(null);
       showFeedback('Great choice! You went around the rocks without damaging the rover (+20 pts).', 'positive');
-      sayAstro('Good decision! Avoiding big boulders protects the rover wheels.', 'happy', 4500);
+      sayAstro('Smart decision! Avoiding big boulders protects the rover wheels.', 'happy', 4500);
     } else if (choice === 'analyze') {
       soundEngine.playPickup();
       setResolvedChallengeIds((prev) => new Set(prev).add(challengeId));
@@ -365,7 +365,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
       setActiveModal(null);
       applyBatteryChange(-3);
       recordBehavioralEvent('explore', 'm3-rock-analyze');
-      showFeedback('Terrain analyzed! You found a safe passage (+30 pts).', 'positive');
+      showFeedback('Terrain scanned! You found a safe passage (+30 pts).', 'positive');
       sayAstro('The scanner found a path between the rocks! Analyzing first pays off.', 'happy', 5000);
     } else {
       soundEngine.playGentleError();
@@ -377,7 +377,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
       setActiveModal(null);
       applyBatteryChange(-12);
       showFeedback('Rock impact! -12% battery and -15 pts!', 'negative');
-      sayAstro('Ouch! Driving over the rocks shook the rover and drained a lot of battery!', 'alert', 5000);
+      sayAstro('Ouch! Driving over rocks shook the rover and drained lots of battery!', 'alert', 5000);
     }
   };
 
@@ -390,8 +390,8 @@ export const Mission3TerrainExplorer: React.FC = () => {
       soundEngine.playSuccess();
       setScore((s) => s + 25);
       setActiveModal(null);
-      showFeedback('Safe route! You saved the rover battery (+25 pts).', 'positive');
-      sayAstro('Smart decision! Looking for flatter terrain saves energy.', 'happy', 4500);
+      showFeedback('Safe route! You saved rover battery (+25 pts).', 'positive');
+      sayAstro('Smart decision! Looking for flatter ground saves energy.', 'happy', 4500);
     } else {
       soundEngine.playGentleError();
       setResolvedChallengeIds((prev) => new Set(prev).add(challengeId));
@@ -402,7 +402,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
       applyBatteryChange(-15);
       recordDecision({ m3SteepSlopeAttempts: (save.campaignMemory?.m3SteepSlopeAttempts ?? 0) + 1 });
       showFeedback('Very tough climb! -15% battery and -10 pts!', 'negative');
-      sayAstro('Phew! Climbing steep slopes uses huge battery power and is dangerous for a base.', 'alert', 5000);
+      sayAstro('Whew! Climbing steep slopes drains huge battery and is dangerous for a base.', 'alert', 5000);
     }
   };
 
@@ -439,13 +439,13 @@ export const Mission3TerrainExplorer: React.FC = () => {
       unlockDiscovery('disc-mola-terrain');
       completeMission('mission-3', 'badge-space-architect', {
         id: 'item-modular-kit',
-        name: 'Modular Building Kit',
+        name: 'Modular Construction Kit',
         category: 'module',
         color: '#34D399',
         acquiredIn: 'mission-3',
       });
       sayAstro(
-        'Fantastic! The Green Plain is the best site to build the base with stability!',
+        'Fantastic! The Green Plain is the best spot to build a stable base!',
         'happy',
         6000
       );
@@ -454,8 +454,8 @@ export const Mission3TerrainExplorer: React.FC = () => {
       setFailureReason('unsuitable_site');
       sayAstro(
         candidate.id === 'B'
-          ? 'Watch out: this sloped terrain could make the base unstable! Try picking the flat site.'
-          : 'Oh no! This hill is way too steep to build a safe base!',
+          ? 'Careful: this sloped terrain could make the base unstable! Try picking the flat site.'
+          : 'Oh no! This hill is too steep to build a safe base!',
         'alert',
         6000
       );
@@ -484,7 +484,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
         missionTitle="Mission 03 · Terrain Explorer"
         goalText={
           step === 'BRIEFING'
-            ? 'Prepare the expedition to choose the best site for the base.'
+            ? 'Prepare the expedition to choose the best base site.'
             : step === 'EXPLORING'
               ? 'Drive the rover, collect samples, and reach sites A, B, or C.'
               : step === 'SELECT_BASE'
@@ -500,7 +500,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
         onOpenCodex={() => setCodexOpen(true)}
         onRepeatHint={() => {
           sayAstro(
-            'Tip: Move the rover along the green tiles to save battery, collect the glowing samples, and choose the flattest terrain for the base!',
+            'Tip: Move the rover across green tiles to save battery, collect the glowing samples, and choose the flattest ground for the base!',
             'curious',
             7000
           );
@@ -525,7 +525,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
                   Terrain Explorer
                 </h1>
                 <p className="mt-3 text-base leading-relaxed text-purple-100">
-                  "Welcome, Junior Astronaut! Our team needs to build a new space base. Explore the terrain, drive the rover, collect samples, and find the best spot for our base!"
+                  "Welcome, Junior Astronaut! Our team needs to build a new space base. Explore the terrain, control the rover, collect samples, and find the best spot for our base!"
                 </p>
               </div>
             </div>
@@ -565,7 +565,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
 
             {/* Scientific Distinction Note */}
             <div className="mt-5 rounded-xl border border-sky-400/35 bg-sky-500/10 px-4 py-2.5 text-xs text-sky-100">
-              <strong>Training note:</strong> This map uses illustrative values inspired by <strong>Earth SRTM</strong> elevation data. On a real mission on the Moon, <strong>LOLA</strong> is used, and on Mars, <strong>MOLA</strong> is used!
+              <strong>Training note:</strong> This map uses illustrative values inspired by <strong>Earth SRTM</strong> elevation data. A real mission uses <strong>LOLA</strong> on the Moon and <strong>MOLA</strong> on Mars!
             </div>
 
             <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
@@ -582,7 +582,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
                   soundEngine.playSuccess();
                   setStep('EXPLORING');
                   sayAstro(
-                    'Let us go! Use the arrow keys, WASD, or the on-screen buttons to drive the rover to sites A, B, or C!',
+                    'Let us go! Use the arrow keys, WASD, or on-screen buttons to drive the rover to sites A, B, or C!',
                     'happy',
                     6500
                   );
@@ -658,7 +658,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
             <div className="flex items-center justify-between rounded-xl border border-[#462A72] bg-[#160A29] px-3 py-2">
               <span className="flex items-center gap-1.5 text-xs font-semibold text-purple-100">
                 <Trophy className="h-4 w-4 text-amber-300" />
-                Score
+                Points
               </span>
               <span className="font-mono-tabular text-sm font-bold text-amber-300">{score}</span>
             </div>
@@ -669,7 +669,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
               onClick={() => {
                 if (!canOpenBaseSelection) {
                   soundEngine.playGentleError();
-                  showFeedback('Explore a bit further toward sites A, B, or C on the right!', 'info');
+                  showFeedback('Explore a bit closer to sites A, B, or C on the right!', 'info');
                   return;
                 }
                 soundEngine.playSuccess();
@@ -682,7 +682,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
               }`}
             >
               <Flag className="h-4 w-4 shrink-0" />
-              <span>{canOpenBaseSelection ? 'Choose Base!' : 'Reach A/B/C'}</span>
+              <span>{canOpenBaseSelection ? 'Choose Base!' : 'Head to A/B/C'}</span>
             </button>
           </section>
 
@@ -751,7 +751,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
               Final Mission Decision
             </p>
             <h1 className="mt-1 font-display text-2xl font-bold text-white sm:text-3xl">
-              Where Shall We Build the Space Base?
+              Where Should We Build the Space Base?
             </h1>
             <p className="mt-1 text-sm text-purple-200/85">
               Check the slope and ease of access before choosing!
@@ -855,7 +855,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
           </div>
 
           <div className="rounded-xl border border-sky-400/35 bg-sky-500/10 px-4 py-2.5 text-center text-xs text-sky-100">
-            <strong>Remember:</strong> Flat terrain helps a lot, but a real space base also needs soil, temperature, and radiation analysis — elevation alone does not guarantee everything!
+            <strong>Remember:</strong> Flat terrain helps a lot, but a real space base also needs soil, temperature, and radiation analysis — elevation alone is not enough!
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3">
@@ -917,7 +917,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
 
             <p className="mt-2 text-sm leading-relaxed text-purple-100">
               {failureReason === 'battery'
-                ? 'The rover ran out of power before finishing the expedition. Next time, avoid orange and rocky zones and use the Solar Point!'
+                ? 'The rover ran out of energy before finishing the expedition. On your next attempt, avoid orange and rocky zones and use the Solar Point!'
                 : chosenBase?.feedbackText}
             </p>
 
@@ -951,8 +951,8 @@ export const Mission3TerrainExplorer: React.FC = () => {
               <p className="mt-1 leading-relaxed">
                 {chosenBase
                   ? `${chosenBase.name} · Slope ${chosenBase.slopeLabel} · Access ${chosenBase.accessibility}.`
-                  : 'The rover needed to reach a flat zone with enough battery.'}{' '}
-                Green, flat terrain makes building easier, while slopes and rocks drain more energy and risk tilting. (Illustrative SRTM data — in real life multiple sensors are combined besides elevation!)
+                  : 'The rover needed to reach a flat zone with enough battery left.'}{' '}
+                Green flat terrain makes construction easier, while slopes and rocks consume more energy and bring tilt risk. (Illustrative SRTM data — real missions combine multiple sensors beyond elevation!)
               </p>
             </div>
 
@@ -1024,7 +1024,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
                 onClick={() => handleRockyChoice('analyze')}
                 className="flex items-center justify-between rounded-xl border-2 border-sky-400/70 bg-sky-500/20 px-4 py-3 text-left text-sm font-bold text-white hover:bg-sky-500/30"
               >
-                <span>Stop and analyze terrain</span>
+                <span>Stop and scan the terrain</span>
                 <span className="text-xs text-sky-200">+30 pts · -3% bat</span>
               </button>
               <button
@@ -1040,7 +1040,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
                 onClick={() => handleRockyChoice('cross')}
                 className="flex items-center justify-between rounded-xl border-2 border-rose-400/70 bg-rose-500/20 px-4 py-3 text-left text-sm font-bold text-white hover:bg-rose-500/30"
               >
-                <span>Try to cross the rocks</span>
+                <span>Try to drive over the rocks</span>
                 <span className="text-xs text-rose-200">Risky!</span>
               </button>
             </div>
@@ -1091,7 +1091,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-500/20 text-sky-300">
               <Gem className="h-8 w-8" />
             </div>
-            <div className="mt-3 text-xs font-bold uppercase text-sky-300">Scientific Sample</div>
+            <div className="mt-3 text-xs font-bold uppercase text-sky-300">Science Sample</div>
             <h2 className="mt-1 font-display text-xl font-bold text-white">{activeModal.sample.name}</h2>
             <p className="mt-2 text-sm text-purple-100">{activeModal.sample.clue}</p>
             <button
@@ -1114,7 +1114,7 @@ export const Mission3TerrainExplorer: React.FC = () => {
             </div>
             <h2 className="mt-3 font-display text-xl font-bold text-white">Warning: Low Battery!</h2>
             <p className="mt-2 text-sm text-purple-100">
-              You are down to {battery}% battery. Avoid orange zones and rocks, and look for the yellow Solar Point to recharge!
+              You have {battery}% battery left. Avoid orange zones and rocks, and find the yellow Solar Point to recharge!
             </p>
             <button
               type="button"
@@ -1137,10 +1137,10 @@ export const Mission3TerrainExplorer: React.FC = () => {
               <Flag className="h-8 w-8" />
             </div>
             <h2 className="mt-3 font-display text-xl font-bold text-white">
-              You reached Site {activeModal.candidateId}!
+              Arrived at Site {activeModal.candidateId}!
             </h2>
             <p className="mt-2 text-sm text-purple-100">
-              Would you like to compare the 3 sites now to choose where to build the base, or keep exploring?
+              Do you want to compare the 3 sites now to choose where to build the base, or keep exploring?
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-3">
               <button

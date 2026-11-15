@@ -63,7 +63,7 @@ export const DestinationRoom: React.FC = () => {
   // ASTRO introduces the Moon and Mars exploration challenges on entry
   useEffect(() => {
     sayAstro(
-      'There are exploration challenges on the Moon and Mars! Choose a planetary pedestal to investigate and explore.',
+      'There are exploration challenges on the Moon and Mars! Choose a planetary pedestal for us to investigate and explore.',
       'curious',
       7000
     );
@@ -97,8 +97,8 @@ export const DestinationRoom: React.FC = () => {
       soundEngine.playSuccess();
       sayAstro(
         dest === 'mars'
-          ? `Destination selected: Mars! Now come with me to the Equipment Room to gear up, Commander ${commanderName}!`
-          : `Destination selected: Moon! Now come with me to the Equipment Room to gear up, Commander ${commanderName}!`,
+          ? `Destination chosen: Mars! Now come with me to the Equipment Room to suit up, Commander ${commanderName}!`
+          : `Destination chosen: Moon! Now come with me to the Equipment Room to suit up, Commander ${commanderName}!`,
         'happy',
         7000
       );
@@ -215,7 +215,7 @@ export const DestinationRoom: React.FC = () => {
       label: 'Equipment Room',
       sublabel: chosenDest
         ? nearEquipDoor
-          ? '[E] Enter & Gear Up'
+          ? '[E] Enter & Suit Up'
           : 'Follow ASTRO →'
         : 'Choose destination',
       active: chosenDest !== null,
@@ -262,7 +262,7 @@ export const DestinationRoom: React.FC = () => {
             className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#543487] bg-[#2D174D] px-3 text-xs font-semibold text-purple-100 hover:border-sky-300"
           >
             <Shirt className="h-3.5 w-3.5 text-sky-300" />
-            <span>Gear Up</span>
+            <span>Suit Up</span>
           </button>
           <button
             type="button"
@@ -327,7 +327,7 @@ export const DestinationRoom: React.FC = () => {
             <Sparkles className="h-4 w-4 text-amber-300 shrink-0" />
             <span>
               {chosenDest
-                ? `Destination: ${chosenDest === 'mars' ? 'Mars' : 'Moon'}! Come with me to the Equipment Room to gear up.`
+                ? `Destination: ${chosenDest === 'mars' ? 'Mars' : 'Moon'}! Come with me to the Equipment Room to suit up.`
                 : 'ASTRO: "We have challenges on the Moon and Mars. Choose a 3D globe to explore!"'}
             </span>
           </div>
@@ -358,7 +358,7 @@ export const DestinationRoom: React.FC = () => {
               className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border-2 border-white border-b-4 bg-gradient-to-b from-[#FDE047] to-[#EAB308] px-4 text-xs font-bold text-slate-950 shadow-lg transition-transform hover:scale-105 active:scale-95"
             >
               <Shirt className="h-3.5 w-3.5" />
-              <span>Go Gear Up</span>
+              <span>Go Suit Up</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           )}

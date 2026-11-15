@@ -70,7 +70,7 @@ export const PrologueHangar: React.FC = () => {
 
   useEffect(() => {
     sayAstro(
-      `Welcome to the Equipment Room, Commander ${commanderName}! Choose your look and suit before heading to ${isMoon ? 'the Moon' : 'Mars'}.`,
+      `Welcome to the Equipment Room, Commander ${commanderName}! Choose your look and suit before we head to ${isMoon ? 'the Moon' : 'Mars'}.`,
       'happy',
       6500
     );
@@ -186,16 +186,16 @@ export const PrologueHangar: React.FC = () => {
             <div className="flex items-center justify-between border-b-2 border-[#462A72] bg-[#2D1650] px-4 py-3">
               <div>
                 <h1 className="font-display text-lg font-bold text-amber-300 leading-tight">
-                  {activeTab === 'hair' && "Commander's Hair"}
+                  {activeTab === 'hair' && 'Commander Hair'}
                   {activeTab === 'skin' && 'Skin Tone'}
                   {activeTab === 'eyes' && 'Eye Color'}
                   {activeTab === 'suit' && 'Space Suit'}
-                  {activeTab === 'visor' && 'Helmet & Visor'}
+                  {activeTab === 'visor' && 'Helmet & Crystal'}
                   {activeTab === 'emblem' && 'Mission Emblem'}
                   {activeTab === 'identity' && 'Name & Team'}
                 </h1>
                 <p className="text-[11px] text-purple-200/80">
-                  Inclusive customization for every explorer
+                  Inclusive customization for all explorers
                 </p>
               </div>
             </div>
@@ -423,7 +423,7 @@ export const PrologueHangar: React.FC = () => {
                         type="button"
                         onClick={() => {
                           updateCommander({ emblem: opt.id });
-                          triggerReaction(`${opt.label} emblem placed!`);
+                          triggerReaction(`${opt.label} emblem attached!`);
                         }}
                         className={`flex flex-col items-center justify-center rounded-2xl border-2 p-2.5 transition-all ${
                           active
@@ -454,7 +454,7 @@ export const PrologueHangar: React.FC = () => {
                       maxLength={18}
                       value={save.commander.commanderName}
                       onChange={(e) => updateCommander({ commanderName: e.target.value })}
-                      placeholder="E.g. Nova"
+                      placeholder="e.g., Nova"
                       className="mt-1.5 h-11 w-full rounded-xl border-2 border-[#543487] bg-[#140826] px-3.5 text-sm font-semibold text-white focus:border-amber-300 focus:outline-none"
                     />
                   </label>
@@ -465,7 +465,7 @@ export const PrologueHangar: React.FC = () => {
                       maxLength={22}
                       value={save.commander.teamName}
                       onChange={(e) => updateCommander({ teamName: e.target.value })}
-                      placeholder="E.g. Aurora Team"
+                      placeholder="e.g., Team Aurora"
                       className="mt-1.5 h-11 w-full rounded-xl border-2 border-[#543487] bg-[#140826] px-3.5 text-sm font-semibold text-white focus:border-amber-300 focus:outline-none"
                     />
                   </label>
@@ -511,12 +511,12 @@ export const PrologueHangar: React.FC = () => {
           <div className="relative z-10 flex w-full flex-wrap items-center justify-between gap-2">
             <div>
               <div className="text-xs font-bold uppercase tracking-wider text-sky-300">
-                Space Suit Ready
+                Space Gear Ready
               </div>
               <div className="font-display text-xl font-bold text-white">
                 Commander {commanderName}
               </div>
-              <div className="text-xs text-purple-200/80">{save.commander.teamName || 'Aurora Team'}</div>
+              <div className="text-xs text-purple-200/80">{save.commander.teamName || 'Team Aurora'}</div>
             </div>
 
             <div className="rounded-2xl border border-[#543487] bg-[#160A29]/90 px-3.5 py-2 text-right">
@@ -544,7 +544,7 @@ export const PrologueHangar: React.FC = () => {
                 mood={celebratePulse ? 'happy' : (astroDialogue?.mood ?? 'happy')}
                 caption={
                   astroDialogue?.text ??
-                  `You're ready, Commander ${commanderName}! Ready to launch for ${isMoon ? 'the Moon' : 'Mars'}?`
+                  `You're ready, Commander ${commanderName}! Shall we launch to ${isMoon ? 'the Moon' : 'Mars'}?`
                 }
                 showCaptions={save.settings.captionsEnabled}
                 size={84}
@@ -572,7 +572,7 @@ export const PrologueHangar: React.FC = () => {
               className="inline-flex h-14 items-center gap-2.5 rounded-full border-4 border-white border-b-[6px] bg-gradient-to-b from-[#FDE047] via-[#FACC15] to-[#EAB308] px-7 font-display text-lg font-bold text-slate-950 shadow-[0_8px_24px_rgba(250,204,21,0.35)] transition-transform hover:scale-105 active:scale-95"
             >
               <Rocket className="h-5 w-5" />
-              <span>Launch for {isMoon ? 'the Moon' : 'Mars'} (Mission 1)!</span>
+              <span>Launch to {isMoon ? 'the Moon' : 'Mars'} (Mission 1)!</span>
               <ArrowRight className="h-5 w-5" />
             </button>
           </div>

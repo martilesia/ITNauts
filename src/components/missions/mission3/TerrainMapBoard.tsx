@@ -60,7 +60,7 @@ export const TerrainMapBoard: React.FC<TerrainMapBoardProps> = ({
             gridTemplateColumns: `repeat(${GRID_COLS}, minmax(0, 1fr))`,
           }}
           role="grid"
-          aria-label="Interactive 2D topographic map"
+          aria-label="2D interactive topographic map"
         >
           {grid.flat().map((tile) => {
             const key = `${tile.col},${tile.row}`;
@@ -216,7 +216,7 @@ export const TerrainMapBoard: React.FC<TerrainMapBoardProps> = ({
           <div className="mt-3 space-y-1.5 border-t border-[#462A72] pt-3 text-xs text-purple-100">
             <div className="flex items-center gap-2">
               <Gem className="h-4 w-4 text-sky-400 shrink-0" />
-              <span>Scientific sample (+50 pts)</span>
+              <span>Science sample (+50 pts)</span>
             </div>
             <div className="flex items-center gap-2">
               <TriangleAlert className="h-4 w-4 text-amber-300 shrink-0" />

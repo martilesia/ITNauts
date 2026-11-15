@@ -66,7 +66,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             style={{ backgroundColor: carryingColor || '#FACC15' }}
             aria-hidden="true"
           />
-          <span>Holding: {carryingName}</span>
+          <span>In hand: {carryingName}</span>
         </div>
       )}
 
@@ -94,10 +94,10 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             onOpenCodex();
           }}
           className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#543487] bg-[#2D174D] px-3 text-xs font-semibold text-white transition-colors hover:border-amber-300 focus-visible:outline-2 focus-visible:outline-amber-300 whitespace-nowrap shrink-0"
-          aria-label="Open scientific discovery logbook"
+          aria-label="Open scientific discovery journal"
         >
           <BookOpen className="h-4 w-4 text-emerald-400" />
-          <span>Logbook</span>
+          <span>Journal</span>
           <span className="font-mono-tabular text-purple-200">({save.discoveries.length})</span>
         </button>
 
@@ -105,7 +105,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           type="button"
           onClick={() => toggleSetting('soundEnabled')}
           className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#543487] bg-[#2D174D] text-white transition-colors hover:border-sky-400 focus-visible:outline-2 focus-visible:outline-sky-300 shrink-0"
-          aria-label={save.settings.soundEnabled ? 'Mute sound' : 'Enable sound'}
+          aria-label={save.settings.soundEnabled ? 'Mute sounds' : 'Enable sounds'}
           title={save.settings.soundEnabled ? 'Sound on' : 'Sound off'}
         >
           {save.settings.soundEnabled ? <Volume2 className="h-4 w-4 text-sky-300" /> : <VolumeX className="h-4 w-4 text-purple-300/60" />}
@@ -140,7 +140,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
               ? 'border-amber-400 bg-amber-400/20 text-amber-200'
               : 'border-[#543487] bg-[#2D174D] text-purple-200/80'
           }`}
-          aria-label={save.settings.reducedStimuli ? 'Disable calm mode' : 'Enable reduced stimuli mode'}
+          aria-label={save.settings.reducedStimuli ? 'Turn off calm mode' : 'Turn on reduced stimuli mode'}
           title="Reduced visual stimuli mode"
         >
           {save.settings.reducedStimuli ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

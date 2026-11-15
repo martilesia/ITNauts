@@ -2,14 +2,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AlertTriangle,
   ArrowRight,
-  Award,
   BatteryCharging,
-  Bot,
-  Clock,
-  Info,
   Play,
   RotateCcw,
-  ShieldAlert,
+  Shield,
   Sparkles,
   Sun,
   Trophy,
@@ -18,179 +14,21 @@ import {
 } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
 import { soundEngine } from '../../utils/soundEngine';
+import { AstroCompanion } from '../engine/AstroCompanion';
+import { CommanderSprite } from '../engine/CommanderSprite';
 import { DiscoveryCodexModal } from '../engine/DiscoveryCodexModal';
 import { GameHUD } from '../engine/GameHUD';
-import { MarsStormCanvas } from './mission2/MarsStormCanvas';
+import { M2StructureId, M2StructureState, MarsStormCanvas } from './mission2/MarsStormCanvas';
 
-type GameStatus = 'TITLE' | 'PLAYING' | 'WON' | 'LOST';
-type DifficultyLevel = 1 | 2 | 3;
+type Phase = 'BRIEFING' | 'DEFENSE' | 'RESULTS';
 
-interface DifficultyConfig {
-  level: DifficultyLevel;
-  label: string;
-  durationSec: number;
-  baseDrainPerSec: number;
-  dustBuildPerSec: number;
-  eventIntervalSec: number;
-}
-
-const DIFFICULTIES: Record<DifficultyLevel, DifficultyConfig> = {
-  1: {
-    level: 1,
-    label: 'Level 1 · Red Breeze',
-    durationSec: 45,
-    baseDrainPerSec: 3.1,
-    dustBuildPerSec: 3.0,
-    eventIntervalSec: 12,
-  },
-  2: {
-    level: 2,
-    label: 'Level 2 · Strong Storm',
-    durationSec: 60,
-    baseDrainPerSec: 3.7,
-    dustBuildPerSec: 4.0,
-    eventIntervalSec: 11,
-  },
-  3: {
-    level: 3,
-    label: 'Level 3 · Super Storm',
-    durationSec: 75,
-    baseDrainPerSec: 4.3,
-    dustBuildPerSec: 5.0,
-    eventIntervalSec: 10,
-  },
-};
-
-interface StormEventOption {
-  label: string;
-  effectHint: string;
-  apply: (curr: SimState) => Partial<SimState>;
-}
-
-interface StormEvent {
-  id: string;
-  title: string;
-  kind: 'storm' | 'dust' | 'energy' | 'battery';
-  optionA: StormEventOption;
-  optionB: StormEventOption;
-}
-
-interface SimState {
-  energy: number;
-  oxygen: number;
-  batteryCharge: number;
-  dustLevel: number;
-  timeLeft: number;
-  score: number;
-  powerSaving: boolean;
-  batteriesActive: boolean;
-  roverCleaning: boolean;
-  roverProgress: number;
-  stormIntensity: number;
-  lossReason: string;
-}
-
-const STORM_EVENTS: StormEvent[] = [
-  {
-    id: 'storm-intense',
-    title: 'The storm just got stronger!',
-    kind: 'storm',
-    optionA: {
-      label: 'Seal Hatches',
-      effectHint: '-5% Energy · Protects O₂',
-      apply: (s) => ({
-        energy: Math.max(4, s.energy - 5),
-        oxygen: Math.min(100, s.oxygen + 10),
-        score: s.score + 90,
-      }),
-    },
-    optionB: {
-      label: 'Keep Sensors On',
-      effectHint: '+140 Pts · +Dust',
-      apply: (s) => ({
-        dustLevel: Math.min(100, s.dustLevel + 14),
-        score: s.score + 140,
-      }),
-    },
-  },
-  {
-    id: 'panels-dust',
-    title: 'Solar panels are covered in dust!',
-    kind: 'dust',
-    optionA: {
-      label: 'Send Rover Now',
-      effectHint: '-6% Energy · -45% Dust',
-      apply: (s) => ({
-        energy: Math.max(4, s.energy - 6),
-        dustLevel: Math.max(0, s.dustLevel - 45),
-        score: s.score + 110,
-      }),
-    },
-    optionB: {
-      label: 'Save & Wait',
-      effectHint: 'Enables Power Save',
-      apply: (s) => ({
-        powerSaving: true,
-        score: s.score + 70,
-      }),
-    },
-  },
-  {
-    id: 'energy-drop',
-    title: 'Energy is dropping!',
-    kind: 'energy',
-    optionA: {
-      label: 'Turn Off Lab',
-      effectHint: '+10% Energy · Power Save',
-      apply: (s) => ({
-        energy: Math.min(100, s.energy + 10),
-        powerSaving: true,
-        score: s.score + 95,
-      }),
-    },
-    optionB: {
-      label: 'Use Extra Reserve',
-      effectHint: '+18% Energy · -22% Battery',
-      apply: (s) => ({
-        energy: Math.min(100, s.energy + 18),
-        batteryCharge: Math.max(0, s.batteryCharge - 22),
-        score: s.score + 85,
-      }),
-    },
-  },
-  {
-    id: 'battery-low',
-    title: 'Battery is almost empty!',
-    kind: 'battery',
-    optionA: {
-      label: 'Eco Mode',
-      effectHint: '+14% Battery · Power Save',
-      apply: (s) => ({
-        batteryCharge: Math.min(100, s.batteryCharge + 14),
-        powerSaving: true,
-        score: s.score + 90,
-      }),
-    },
-    optionB: {
-      label: 'Quick Clean',
-      effectHint: '-28% Solar Dust',
-      apply: (s) => ({
-        dustLevel: Math.max(0, s.dustLevel - 28),
-        score: s.score + 100,
-      }),
-    },
-  },
-];
-
-function computeSolarOutput(dustLevel: number, stormIntensity: number): number {
-  const cleanFactor = Math.max(0.08, 1 - dustLevel / 105);
-  const skyFactor = Math.max(0.22, 1 - stormIntensity * 0.58);
-  return Math.round(Math.max(5, Math.min(100, cleanFactor * skyFactor * 100)));
-}
+const TOTAL_SECONDS = 30;
 
 export const Mission2RedStorm: React.FC = () => {
   const {
+    save,
     setRoute,
+    astroDialogue,
     sayAstro,
     unlockDiscovery,
     completeMission,
@@ -198,737 +36,629 @@ export const Mission2RedStorm: React.FC = () => {
     recordBehavioralEvent,
   } = useGame();
 
-  const [status, setStatus] = useState<GameStatus>('TITLE');
-  const [difficulty, setDifficulty] = useState<DifficultyLevel>(1);
+  const isMoon = save.selectedDestination === 'moon';
+  const destinationLabel = isMoon ? 'Moon' : 'Mars';
+  const commanderName = save.commander.commanderName || 'Nova';
+  const missionOpTitle = isMoon ? 'Lunar Shield' : 'Red Storm';
+
+  const hasM1Reflective = save.campaignMemory?.m1ThermalShield === 'reflective';
+  const hasM1ElectroFilter = save.campaignMemory?.m1DustFilter === 'electrostatic';
+
+  const buildInitialStructures = useCallback((): M2StructureState[] => {
+    return [
+      {
+        id: 'solar',
+        label: 'Panels',
+        pos: { x: 20, y: 55 },
+        shielded: false,
+        damaged: false,
+        dustLevel: 15,
+      },
+      {
+        id: 'sensors',
+        label: 'Sensors',
+        pos: { x: 42, y: 42 },
+        shielded: false,
+        damaged: false,
+        dustLevel: 0,
+      },
+      {
+        id: 'habitat',
+        label: 'Habitat',
+        pos: { x: 63, y: 55 },
+        shielded: hasM1Reflective,
+        permanentShield: hasM1Reflective,
+        damaged: false,
+        dustLevel: 0,
+      },
+      {
+        id: 'battery',
+        label: 'Batteries',
+        pos: { x: 82, y: 42 },
+        shielded: false,
+        damaged: false,
+        dustLevel: 0,
+      },
+    ];
+  }, [hasM1Reflective]);
+
+  const [phase, setPhase] = useState<Phase>('BRIEFING');
+  const [timerSec, setTimerSec] = useState(TOTAL_SECONDS);
+  const [energy, setEnergy] = useState(85);
+  const [oxygen, setOxygen] = useState(95);
+  const [score, setScore] = useState(0);
+  const [repairedCount, setRepairedCount] = useState(0);
+  const [blockedCount, setBlockedCount] = useState(0);
+  const [structures, setStructures] = useState<M2StructureState[]>(buildInitialStructures);
+  const [targetedId, setTargetedId] = useState<M2StructureId | null>(null);
+  const [roverPosPct, setRoverPosPct] = useState(20);
+  const [roverBusy, setRoverBusy] = useState(false);
+  const [crisisModalOpen, setCrisisModalOpen] = useState(false);
+  const [crisisDone, setCrisisDone] = useState(false);
+  const [lastHitFeedback, setLastHitFeedback] = useState<{
+    id: M2StructureId;
+    text: string;
+    tone: 'good' | 'bad';
+  } | null>(null);
+  const [failReason, setFailReason] = useState<'energy' | 'oxygen' | null>(null);
   const [codexOpen, setCodexOpen] = useState(false);
 
-  const [sim, setSim] = useState<SimState>({
-    energy: 82,
-    oxygen: 96,
-    batteryCharge: 85,
-    dustLevel: 25,
-    timeLeft: DIFFICULTIES[1].durationSec,
-    score: 0,
-    powerSaving: false,
-    batteriesActive: false,
-    roverCleaning: false,
-    roverProgress: 0,
-    stormIntensity: 0.45,
-    lossReason: '',
-  });
+  const structuresRef = useRef(structures);
+  structuresRef.current = structures;
 
-  const [activeEvent, setActiveEvent] = useState<StormEvent | null>(null);
-  const [actionToast, setActionToast] = useState<string | null>(null);
+  const targetedRef = useRef(targetedId);
+  targetedRef.current = targetedId;
 
-  const simRef = useRef(sim);
-  simRef.current = sim;
-  const eventTimerRef = useRef(0);
-  const lastEventIndexRef = useRef(-1);
-  const toastTimeoutRef = useRef<number | null>(null);
+  const startDefense = () => {
+    soundEngine.playClick();
+    setStructures(buildInitialStructures());
+    setTimerSec(TOTAL_SECONDS);
+    setEnergy(85);
+    setOxygen(95);
+    setScore(0);
+    setRepairedCount(0);
+    setBlockedCount(0);
+    setTargetedId(null);
+    setRoverPosPct(20);
+    setRoverBusy(false);
+    setCrisisModalOpen(false);
+    setCrisisDone(false);
+    setLastHitFeedback(null);
+    setFailReason(null);
+    setPhase('DEFENSE');
 
-  const showQuickFeedback = useCallback((msg: string) => {
-    setActionToast(msg);
-    if (toastTimeoutRef.current !== null) {
-      window.clearTimeout(toastTimeoutRef.current);
-    }
-    toastTimeoutRef.current = window.setTimeout(() => {
-      setActionToast(null);
-    }, 2200);
-  }, []);
+    sayAstro(
+      isMoon
+        ? 'Solar flare! Tap modules with a red ring to turn on the shield, and clean dust off the panels!'
+        : 'Storm active! Protect modules with a danger ring and send the rover to clean the panels!',
+      'alert',
+      6500
+    );
+  };
 
-  const startMission = useCallback(
-    (lvl: DifficultyLevel) => {
-      const cfg = DIFFICULTIES[lvl];
-      soundEngine.playStormAlert();
-      setDifficulty(lvl);
-      eventTimerRef.current = 0;
-      setActiveEvent(null);
-      setActionToast(null);
-      setSim({
-        energy: 82,
-        oxygen: 96,
-        batteryCharge: 85,
-        dustLevel: 22,
-        timeLeft: cfg.durationSec,
-        score: 0,
-        powerSaving: false,
-        batteriesActive: false,
-        roverCleaning: false,
-        roverProgress: 0,
-        stormIntensity: 0.42,
-        lossReason: '',
-      });
-      setStatus('PLAYING');
-      sayAstro('Alert! The dust storm has begun! Keep energy above zero!', 'alert', 4500);
+  const showHitFeedback = useCallback(
+    (id: M2StructureId, text: string, tone: 'good' | 'bad') => {
+      setLastHitFeedback({ id, text, tone });
+      window.setTimeout(() => {
+        setLastHitFeedback((curr) => (curr?.id === id && curr?.text === text ? null : curr));
+      }, 1500);
     },
-    [sayAstro]
+    []
   );
 
-  // Main 100ms game simulation loop
+  // Direct module click: repair if damaged, otherwise toggle shield ON/OFF
+  const handleStructureClick = (id: M2StructureId) => {
+    if (phase !== 'DEFENSE' || crisisModalOpen) return;
+
+    setStructures((prev) =>
+      prev.map((s) => {
+        if (s.id !== id) return s;
+        if (s.damaged) {
+          soundEngine.playSuccess();
+          setRepairedCount((c) => c + 1);
+          setEnergy((e) => Math.max(0, e - 4));
+          setScore((sc) => sc + 15);
+          recordDecision({ m2RepairedAfterStorm: true });
+          recordBehavioralEvent('adapt');
+          showHitFeedback(id, 'Repaired! +15', 'good');
+          return { ...s, damaged: false, shielded: true };
+        }
+        if (s.permanentShield) {
+          soundEngine.playClick();
+          showHitFeedback(id, 'Gold Shield!', 'good');
+          return s;
+        }
+        const nextShield = !s.shielded;
+        soundEngine.playClick();
+        if (nextShield) recordBehavioralEvent('explore');
+        return { ...s, shielded: nextShield };
+      })
+    );
+  };
+
+  // Rover cleans dust from Solar Panels
+  const handleRoverClean = () => {
+    if (phase !== 'DEFENSE' || roverBusy || crisisModalOpen) return;
+    soundEngine.playClick();
+    setRoverBusy(true);
+    setRoverPosPct((p) => (p > 45 ? 20 : 75));
+    setEnergy((e) => Math.max(0, e - 5));
+    recordBehavioralEvent('explore');
+
+    window.setTimeout(() => {
+      setStructures((prev) =>
+        prev.map((s) => (s.id === 'solar' ? { ...s, dustLevel: 0 } : s))
+      );
+      setRoverBusy(false);
+      setScore((sc) => sc + 15);
+      soundEngine.playSuccess();
+      showHitFeedback('solar', 'Panels Cleaned! +15', 'good');
+    }, 700);
+  };
+
+  // Main 1-second simulation tick during DEFENSE
   useEffect(() => {
-    if (status !== 'PLAYING' || activeEvent !== null) return;
+    if (phase !== 'DEFENSE' || crisisModalOpen) return;
 
-    const cfg = DIFFICULTIES[difficulty];
-    const dt = 0.1;
+    const interval = window.setInterval(() => {
+      const currStructures = structuresRef.current;
+      const currTarget = targetedRef.current;
 
-    const timer = window.setInterval(() => {
-      const curr = simRef.current;
-      const nextTimeLeft = Math.max(0, curr.timeLeft - dt);
-
-      // Storm wave intensity varies over time
-      const progressRatio = 1 - nextTimeLeft / cfg.durationSec;
-      const nextStormIntensity = Math.min(
-        1,
-        0.38 + Math.sin(progressRatio * Math.PI * 2.5) * 0.22 + progressRatio * 0.42
+      // 1. Update dust on solar panels
+      setStructures((prev) =>
+        prev.map((s) => {
+          if (s.id !== 'solar') return s;
+          const dustGain = hasM1ElectroFilter ? 3.5 : 6.5;
+          return { ...s, dustLevel: Math.min(100, s.dustLevel + dustGain) };
+        })
       );
 
-      // Dust accumulation (paused slightly while rover sweeps)
-      let nextDust = curr.dustLevel + cfg.dustBuildPerSec * nextStormIntensity * dt;
-      let nextRoverCleaning = curr.roverCleaning;
-      let nextRoverProgress = curr.roverProgress;
+      // 2. Energy balance: active non-permanent shields drain energy; clean solar panels recharge!
+      const activeShieldCount = currStructures.filter(
+        (s) => s.shielded && !s.permanentShield && !s.damaged
+      ).length;
+      const solar = currStructures.find((s) => s.id === 'solar');
+      const solarOutput = solar?.damaged ? 0 : Math.max(0.5, 4.2 - (solar?.dustLevel ?? 0) / 28);
+      const batteryDamagedPenalty = currStructures.find((s) => s.id === 'battery')?.damaged ? 2.5 : 0;
 
-      if (curr.roverCleaning) {
-        nextRoverProgress += dt / 2.6; // 2.6s rover round trip
-        nextDust = Math.max(0, nextDust - 22 * dt);
-        if (nextRoverProgress >= 1) {
-          nextRoverCleaning = false;
-          nextRoverProgress = 0;
-          soundEngine.playSuccess();
-          showQuickFeedback('Panels cleaned!');
+      setEnergy((prev) => {
+        const next = Math.max(
+          0,
+          Math.min(100, prev + solarOutput - activeShieldCount * 1.4 - 1.2 - batteryDamagedPenalty)
+        );
+        if (next <= 0) {
+          setFailReason('energy');
+          setPhase('RESULTS');
         }
-      }
-      nextDust = Math.min(100, Math.max(0, nextDust));
-
-      // Solar production
-      const solarPct = computeSolarOutput(nextDust, nextStormIntensity);
-      const solarEnergyGain = (solarPct / 100) * 3.1 * dt;
-
-      // Energy consumption & battery flow
-      const drain = (curr.powerSaving ? cfg.baseDrainPerSec * 0.45 : cfg.baseDrainPerSec) * dt;
-
-      let nextBattery = curr.batteryCharge;
-      let batteryBoost = 0;
-      let nextBatteriesActive = curr.batteriesActive;
-
-      if (curr.batteriesActive && nextBattery > 0) {
-        const discharge = Math.min(nextBattery, 6.2 * dt);
-        nextBattery = Math.max(0, nextBattery - discharge);
-        batteryBoost = discharge * 0.85;
-        if (nextBattery <= 0.1) {
-          nextBatteriesActive = false;
-          soundEngine.playGentleError();
-          showQuickFeedback('Batteries empty!');
-        }
-      } else if (!curr.batteriesActive && solarPct > 55 && curr.powerSaving) {
-        // Gentle solar trickle recharge when clean & saving power
-        nextBattery = Math.min(100, nextBattery + 1.2 * dt);
-      }
-
-      const nextEnergy = Math.max(0, Math.min(100, curr.energy + solarEnergyGain + batteryBoost - drain));
-
-      // Oxygen drops slowly if powerSaving is off & energy critical, otherwise stays healthy
-      const o2Delta =
-        nextEnergy < 18
-          ? -3.5 * dt
-          : curr.powerSaving
-            ? 0.4 * dt
-            : -0.25 * dt;
-      const nextOxygen = Math.max(0, Math.min(100, curr.oxygen + o2Delta));
-
-      // Score accumulation
-      const scoreGain = (curr.powerSaving ? 14 : 18) * dt + (solarPct > 50 ? 6 * dt : 0);
-      const nextScore = Math.round(curr.score + scoreGain);
-
-      // Check Loss
-      if (nextEnergy <= 0 || nextOxygen <= 0) {
-        soundEngine.playGentleError();
-        setSim({
-          ...curr,
-          energy: nextEnergy <= 0 ? 0 : nextEnergy,
-          oxygen: nextOxygen <= 0 ? 0 : nextOxygen,
-          batteryCharge: nextBattery,
-          dustLevel: nextDust,
-          timeLeft: nextTimeLeft,
-          score: nextScore,
-          batteriesActive: false,
-          roverCleaning: false,
-          roverProgress: 0,
-          stormIntensity: nextStormIntensity,
-          lossReason:
-            nextEnergy <= 0
-              ? 'Base energy ran out during the storm!'
-              : 'Base oxygen ran out!',
-        });
-        setStatus('LOST');
-        sayAstro('Oh no! Base energy ran out! Let\'s try another strategy!', 'alert', 5000);
-        return;
-      }
-
-      // Check Win
-      if (nextTimeLeft <= 0) {
-        soundEngine.playSuccess();
-        const finalBonus = Math.round(nextEnergy * 3 + nextOxygen * 2);
-        setSim({
-          ...curr,
-          energy: nextEnergy,
-          oxygen: nextOxygen,
-          batteryCharge: nextBattery,
-          dustLevel: nextDust,
-          timeLeft: 0,
-          score: nextScore + finalBonus,
-          batteriesActive: false,
-          roverCleaning: false,
-          roverProgress: 0,
-          stormIntensity: 0.1,
-          lossReason: '',
-        });
-        setStatus('WON');
-        recordDecision({
-          m2PreparedInTime: true,
-          m2EnergyEfficiencyBonus: nextEnergy >= 35,
-          m2RepairedAfterStorm: true,
-        });
-        recordBehavioralEvent('explore', 'm2-dust-storm-survived');
-        unlockDiscovery('disc-mars-storm');
-        completeMission('mission-2', 'badge-mars-guardian', {
-          id: 'item-high-cap-battery',
-          name: 'High-Capacity Battery',
-          category: 'module',
-          color: '#F59E0B',
-          acquiredIn: 'mission-2',
-        });
-        sayAstro('We did it! The storm passed and the whole team is safe!', 'happy', 6000);
-        return;
-      }
-
-      setSim({
-        ...curr,
-        energy: nextEnergy,
-        oxygen: nextOxygen,
-        batteryCharge: nextBattery,
-        dustLevel: nextDust,
-        timeLeft: nextTimeLeft,
-        score: nextScore,
-        batteriesActive: nextBatteriesActive,
-        roverCleaning: nextRoverCleaning,
-        roverProgress: nextRoverProgress,
-        stormIntensity: nextStormIntensity,
+        return next;
       });
 
-      // Random storm events trigger on interval (unless near end < 6s)
-      eventTimerRef.current += dt;
-      if (eventTimerRef.current >= cfg.eventIntervalSec && nextTimeLeft > 6) {
-        eventTimerRef.current = 0;
-        let idx = Math.floor(Math.random() * STORM_EVENTS.length);
-        if (idx === lastEventIndexRef.current) {
-          idx = (idx + 1) % STORM_EVENTS.length;
+      // 3. Oxygen balance: drops faster if Habitat is damaged
+      const habDamaged = currStructures.find((s) => s.id === 'habitat')?.damaged;
+      setOxygen((prev) => {
+        const next = Math.max(0, Math.min(100, prev - (habDamaged ? 4.5 : 0.7) + 0.3));
+        if (next <= 0) {
+          setFailReason('oxygen');
+          setPhase('RESULTS');
         }
-        lastEventIndexRef.current = idx;
-        const picked = STORM_EVENTS[idx];
-        soundEngine.playStormAlert();
-        setActiveEvent(picked);
-      }
-    }, 100);
+        return next;
+      });
 
-    return () => window.clearInterval(timer);
-  }, [
-    status,
-    activeEvent,
-    difficulty,
-    completeMission,
-    recordBehavioralEvent,
-    recordDecision,
-    sayAstro,
-    showQuickFeedback,
-    unlockDiscovery,
-  ]);
+      // 4. Timer & Threat Waves
+      setTimerSec((t) => {
+        const nextT = t - 1;
 
-  // 3 Primary Actions
-  const handleTogglePowerSaving = () => {
-    if (status !== 'PLAYING' || activeEvent) return;
-    soundEngine.playClick();
-    setSim((prev) => {
-      const next = !prev.powerSaving;
-      showQuickFeedback(next ? 'Power saving on!' : 'Equipment on!');
-      return { ...prev, powerSaving: next };
+        // Trigger mid-wave Crisis at 15s remaining
+        if (nextT === 15 && !crisisDone) {
+          setCrisisDone(true);
+          setCrisisModalOpen(true);
+          soundEngine.playStormAlert();
+          return nextT;
+        }
+
+        // Every 4 seconds: resolve previous target OR spawn a new warning target!
+        if (nextT > 1 && nextT % 2 === 0) {
+          if (currTarget) {
+            // Threat hits targeted module!
+            const targetMod = currStructures.find((s) => s.id === currTarget);
+            if (targetMod && (targetMod.shielded || targetMod.permanentShield)) {
+              soundEngine.playSuccess();
+              setBlockedCount((b) => b + 1);
+              setScore((sc) => sc + 20);
+              showHitFeedback(currTarget, 'Defended! +20', 'good');
+            } else if (targetMod && !targetMod.damaged) {
+              soundEngine.playGentleError();
+              setStructures((prev) =>
+                prev.map((s) => (s.id === currTarget ? { ...s, damaged: true, shielded: false } : s))
+              );
+              setEnergy((e) => Math.max(0, e - 8));
+              showHitFeedback(currTarget, 'Damaged! -8%', 'bad');
+            }
+            setTargetedId(null);
+          } else {
+            // Pick a non-damaged module to target (prefer non-permanent-shielded ones)
+            const pool = currStructures.filter((s) => !s.damaged && !s.permanentShield);
+            const fallbackPool = currStructures.filter((s) => !s.damaged);
+            const candidates = pool.length > 0 ? pool : fallbackPool;
+            if (candidates.length > 0) {
+              const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+              setTargetedId(chosen.id);
+              soundEngine.playStormAlert();
+            }
+          }
+        }
+
+        if (nextT <= 0) {
+          setPhase('RESULTS');
+          return 0;
+        }
+        return nextT;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [crisisDone, crisisModalOpen, hasM1ElectroFilter, phase, showHitFeedback]);
+
+  // Finalize mission when entering RESULTS
+  useEffect(() => {
+    if (phase !== 'RESULTS') return;
+    const damagedCount = structures.filter((s) => s.damaged).length;
+    const passed = failReason === null && energy > 0 && oxygen > 0;
+
+    recordDecision({
+      m2PreparedInTime: blockedCount >= 2,
+      m2ProtectedCount: 4 - damagedCount,
+      m2DamagedCount: damagedCount,
+      m2EnergyEfficiencyBonus: energy >= 50,
     });
-  };
 
-  const handleToggleBatteries = () => {
-    if (status !== 'PLAYING' || activeEvent) return;
-    if (!sim.batteriesActive && sim.batteryCharge <= 1) {
+    if (passed) {
+      soundEngine.playSuccess();
+      unlockDiscovery('disc-mars-storm');
+      completeMission('mission-2', 'badge-mars-guardian', {
+        id: isMoon ? 'item-lunar-shield' : 'item-storm-shield',
+        name: isMoon ? 'Lunar Anti-Radiation Shield' : 'Martian Anti-Storm Shield',
+        category: 'module',
+        color: '#38BDF8',
+        acquiredIn: 'mission-2',
+      });
+      sayAstro(
+        `Nice work, ${commanderName}! Base saved with ${Math.round(energy)}% energy and ${blockedCount} blocks!`,
+        'happy',
+        6500
+      );
+    } else {
       soundEngine.playGentleError();
-      showQuickFeedback('Batteries empty!');
-      return;
+      sayAstro(
+        failReason === 'energy'
+          ? 'Power ran out! Turn off shields when there is no danger and clean the panels!'
+          : 'Oxygen ran out! Repair the Habitat quickly when it gets damaged!',
+        'encourage',
+        6500
+      );
     }
-    soundEngine.playPickup();
-    setSim((prev) => {
-      const next = !prev.batteriesActive;
-      showQuickFeedback(next ? 'Batteries powering base!' : 'Batteries on standby');
-      return { ...prev, batteriesActive: next };
-    });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
 
-  const handleCleanPanels = () => {
-    if (status !== 'PLAYING' || activeEvent || sim.roverCleaning) return;
-    if (sim.energy < 8) {
+  const handleCrisisChoice = (choice: 'all-shield' | 'save-power') => {
+    setCrisisModalOpen(false);
+    recordBehavioralEvent('adapt');
+
+    if (choice === 'all-shield') {
+      soundEngine.playSuccess();
+      setEnergy((e) => Math.max(5, e - 15));
+      setStructures((prev) => prev.map((s) => ({ ...s, shielded: true, damaged: false })));
+      setTargetedId(null);
+      setScore((sc) => sc + 25);
+      sayAstro('Full Shield activated! Spent -15% energy but saved all modules!', 'happy', 5000);
+    } else {
       soundEngine.playGentleError();
-      showQuickFeedback('Not enough energy for rover!');
-      return;
+      setEnergy((e) => Math.min(100, e + 20));
+      setStructures((prev) =>
+        prev.map((s) => (s.id === 'sensors' ? { ...s, damaged: true, shielded: false } : s))
+      );
+      setTargetedId(null);
+      showHitFeedback('sensors', 'Sensors Damaged!', 'bad');
+      sayAstro('Saved +20% energy, but the Sensors broke! Click them to repair!', 'alert', 5500);
     }
-    soundEngine.playScan();
-    setSim((prev) => ({
-      ...prev,
-      energy: Math.max(1, prev.energy - 7),
-      roverCleaning: true,
-      roverProgress: 0,
-      score: prev.score + 55,
-    }));
-    showQuickFeedback('Rover cleaning panels!');
   };
 
-  const handleEventChoice = (option: StormEventOption) => {
-    if (!activeEvent) return;
-    soundEngine.playSuccess();
-    setSim((prev) => ({
-      ...prev,
-      ...option.apply(prev),
-    }));
-    showQuickFeedback(option.effectHint);
-    setActiveEvent(null);
-  };
-
-  const solarOutput = computeSolarOutput(sim.dustLevel, sim.stormIntensity);
-  const cfg = DIFFICULTIES[difficulty];
-  const timeRatio = Math.max(0, Math.min(100, (sim.timeLeft / cfg.durationSec) * 100));
+  const missionPassed = failReason === null && energy > 0 && oxygen > 0;
+  const activeShields = structures.filter((s) => s.shielded && !s.permanentShield && !s.damaged).length;
+  const solarDust = Math.round(structures.find((s) => s.id === 'solar')?.dustLevel ?? 0);
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#1B0D2E] text-slate-100 select-none">
+    <div className="min-h-screen bg-[#1B0D2E] text-slate-100 flex flex-col">
       <GameHUD
-        missionTitle="AstroBase · Dust Storm"
-        goalText="Keep the base powered until the storm passes."
-        progressText={status === 'PLAYING' ? `${Math.ceil(sim.timeLeft)}s · ${sim.score} pts` : undefined}
+        missionTitle={`Mission 02 · ${destinationLabel} · ${missionOpTitle}`}
+        goalText={
+          phase === 'BRIEFING'
+            ? `Defend the base against ${isMoon ? 'the solar flare' : 'the dust storm'}!`
+            : phase === 'DEFENSE'
+              ? 'Tap threatened modules to turn on shields and clean dust off the panels!'
+              : 'Base Defense Result'
+        }
+        progressText={phase === 'DEFENSE' ? `${timerSec}s · ${score} pts` : undefined}
         onBackToMap={() => setRoute('CAMPAIGN_MAP')}
         onOpenCodex={() => setCodexOpen(true)}
-        onRepeatHint={() => {
+        onRepeatHint={() =>
           sayAstro(
-            'Save energy when solar output drops, use batteries during dips, and send the rover to clean dust off the panels!',
+            'Tap a module with a red ring to turn on its shield. Turn it off when safe to save energy!',
             'curious',
-            5000
-          );
-        }}
+            6500
+          )
+        }
       />
 
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center gap-3.5 px-4 py-4">
-        {/* TOP VISUAL INDICATORS ONLY (Icons + Progress Bars + Numbers) */}
-        <section
-          aria-label="Base Indicators"
-          className="grid grid-cols-2 gap-2.5 rounded-2xl border-2 border-[#543487] bg-[#21103A] p-3 shadow-lg sm:grid-cols-4"
-        >
-          {/* 1. Energia disponível */}
-          <div className="rounded-xl border border-[#462A72] bg-[#160A29] px-3 py-2">
-            <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
-                <BatteryCharging className="h-5 w-5" />
-                <span>Energy</span>
-              </span>
-              <span className="font-mono-tabular text-base font-extrabold text-white">
-                {Math.round(sim.energy)}%
-              </span>
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 px-4 py-4 sm:px-6">
+        {phase === 'BRIEFING' && (
+          <section className="mx-auto my-auto w-full max-w-2xl rounded-3xl border-2 border-[#543487] bg-[#24123F] p-6 sm:p-8 shadow-2xl text-center">
+            <div className="flex items-end justify-center gap-4">
+              <CommanderSprite profile={save.commander} size={86} />
+              <AstroCompanion mood="alert" showCaptions={false} size={64} />
             </div>
-            <div className="mt-1.5 h-3 overflow-hidden rounded-full bg-slate-800">
-              <div
-                className={`h-full rounded-full transition-all duration-150 ${
-                  sim.energy > 45 ? 'bg-emerald-400' : sim.energy > 22 ? 'bg-amber-400' : 'bg-rose-500'
-                }`}
-                style={{ width: `${sim.energy}%` }}
-              />
-            </div>
-          </div>
 
-          {/* 2. Produção solar */}
-          <div className="rounded-xl border border-[#462A72] bg-[#160A29] px-3 py-2">
-            <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-orange-300">
-                <Sun className="h-5 w-5" />
-                <span>Solar</span>
-              </span>
-              <span className="font-mono-tabular text-base font-extrabold text-white">
-                {solarOutput}%
-              </span>
-            </div>
-            <div className="mt-1.5 h-3 overflow-hidden rounded-full bg-slate-800">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-300 transition-all duration-150"
-                style={{ width: `${solarOutput}%` }}
-              />
-            </div>
-          </div>
+            <h1 className="mt-4 font-display text-2xl sm:text-3xl font-bold text-white">
+              {missionOpTitle} · {destinationLabel}
+            </h1>
+            <p className="mt-2 text-sm text-purple-100/90">
+              {isMoon
+                ? 'A solar flare is coming! Turn on shields only where there is danger so you do not drain the battery.'
+                : 'The storm brings red dust! Protect modules, clean the panels, and repair any damage.'}
+            </p>
 
-          {/* 3. Oxigénio */}
-          <div className="rounded-xl border border-[#462A72] bg-[#160A29] px-3 py-2">
-            <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-sky-300">
-                <Wind className="h-5 w-5" />
-                <span>Oxygen</span>
-              </span>
-              <span className="font-mono-tabular text-base font-extrabold text-white">
-                {Math.round(sim.oxygen)}%
-              </span>
-            </div>
-            <div className="mt-1.5 h-3 overflow-hidden rounded-full bg-slate-800">
-              <div
-                className={`h-full rounded-full transition-all duration-150 ${
-                  sim.oxygen > 40 ? 'bg-sky-400' : 'bg-rose-500'
-                }`}
-                style={{ width: `${sim.oxygen}%` }}
-              />
-            </div>
-          </div>
-
-          {/* 4. Tempo restante da tempestade */}
-          <div className="rounded-xl border border-[#462A72] bg-[#160A29] px-3 py-2">
-            <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-rose-300">
-                <Clock className="h-5 w-5" />
-                <span>Storm</span>
-              </span>
-              <span className="font-mono-tabular text-base font-extrabold text-white">
-                {Math.ceil(sim.timeLeft)}s
-              </span>
-            </div>
-            <div className="mt-1.5 h-3 overflow-hidden rounded-full bg-slate-800">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-rose-500 to-orange-400 transition-all duration-150"
-                style={{ width: `${timeRatio}%` }}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* 2D MARS BASE GAME SCENE + OVERLAYS */}
-        <section className="relative">
-          <MarsStormCanvas
-            energy={sim.energy}
-            solarOutput={solarOutput}
-            oxygen={sim.oxygen}
-            batteryCharge={sim.batteryCharge}
-            dustLevel={sim.dustLevel}
-            stormIntensity={sim.stormIntensity}
-            powerSaving={sim.powerSaving}
-            batteriesActive={sim.batteriesActive}
-            roverCleaning={sim.roverCleaning}
-            roverProgress={sim.roverProgress}
-            status={status}
-            eventActive={activeEvent !== null}
-          />
-
-          {/* Compact feedback pill during action */}
-          {status === 'PLAYING' && actionToast && !activeEvent && (
-            <div className="pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 rounded-full border-2 border-amber-300 bg-[#160A29]/90 px-4 py-1.5 text-xs font-bold text-amber-200 shadow-lg">
-              {actionToast}
-            </div>
-          )}
-
-          {/* TITLE OVERLAY */}
-          {status === 'TITLE' && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-[#160A29]/82 p-5 text-center backdrop-blur-[2px]">
-              <div className="text-xs font-bold uppercase tracking-wider text-orange-300">
-                Mission 02 · Mars
+            {(hasM1Reflective || hasM1ElectroFilter) && (
+              <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-emerald-400/50 bg-emerald-500/15 px-4 py-2 text-xs font-bold text-emerald-200">
+                <Sparkles className="h-4 w-4 shrink-0" />
+                <span>
+                  Mission 1 Bonus:{' '}
+                  {hasM1Reflective ? 'Shielded Habitat ' : ''}
+                  {hasM1ElectroFilter ? '· Less Dust on Panels!' : ''}
+                </span>
               </div>
-              <h1 className="mt-1 font-display text-3xl font-bold text-white sm:text-4xl">
-                Dust Storm
-              </h1>
-              <p className="mt-1.5 max-w-md text-sm text-purple-100">
-                The storm is blocking the sun! Protect the base's energy until the sky clears.
-              </p>
+            )}
 
-              {/* Level Selector */}
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
-                {([1, 2, 3] as DifficultyLevel[]).map((lvl) => (
-                  <button
-                    key={lvl}
-                    type="button"
-                    onClick={() => {
-                      soundEngine.playClick();
-                      setDifficulty(lvl);
-                    }}
-                    className={`rounded-xl border-2 px-3.5 py-2 text-xs font-bold transition-transform hover:scale-105 ${
-                      difficulty === lvl
-                        ? 'border-amber-300 bg-amber-400/25 text-amber-200'
-                        : 'border-[#543487] bg-[#21103A] text-purple-200'
+            <div className="mt-5 grid grid-cols-3 gap-3 text-xs font-bold">
+              <div className="rounded-2xl border border-[#462A72] bg-[#190B2E] p-3.5 flex flex-col items-center gap-1.5">
+                <Shield className="h-6 w-6 text-sky-300" />
+                <span className="text-white">Tap = Shield</span>
+              </div>
+              <div className="rounded-2xl border border-[#462A72] bg-[#190B2E] p-3.5 flex flex-col items-center gap-1.5">
+                <Sun className="h-6 w-6 text-amber-300" />
+                <span className="text-white">Rover Cleans Dust</span>
+              </div>
+              <div className="rounded-2xl border border-[#462A72] bg-[#190B2E] p-3.5 flex flex-col items-center gap-1.5">
+                <Zap className="h-6 w-6 text-emerald-300" />
+                <span className="text-white">Survive 30s!</span>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-center">
+              <button
+                type="button"
+                onClick={startDefense}
+                className="inline-flex h-12 items-center gap-2 rounded-full border-2 border-white border-b-4 bg-gradient-to-b from-[#FDE047] to-[#EAB308] px-8 text-base font-bold text-slate-950 shadow-lg hover:scale-105 active:scale-95 transition-transform"
+              >
+                <Play className="h-5 w-5" />
+                <span>Defend the Base!</span>
+              </button>
+            </div>
+          </section>
+        )}
+
+        {phase === 'DEFENSE' && (
+          <div className="flex flex-col gap-4">
+            {/* Compact Top Action Strip */}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 rounded-2xl border-2 border-[#462A72] bg-[#21103A] p-3">
+              {/* Countdown */}
+              <div className="rounded-xl border border-[#462A72] bg-[#160A29] px-3 py-2 flex items-center justify-between">
+                <span className="text-xs font-bold text-purple-200">Time</span>
+                <span className="font-mono-tabular text-xl font-extrabold text-amber-300">
+                  {timerSec}s
+                </span>
+              </div>
+
+              {/* Energy Bar */}
+              <div className="rounded-xl border border-[#462A72] bg-[#160A29] px-3 py-2">
+                <div className="flex items-center justify-between text-xs font-bold">
+                  <span className="flex items-center gap-1 text-amber-300">
+                    <BatteryCharging className="h-4 w-4" /> Energy
+                  </span>
+                  <span className="font-mono-tabular text-white">{Math.round(energy)}%</span>
+                </div>
+                <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-900">
+                  <div
+                    className={`h-full transition-all ${
+                      energy > 45 ? 'bg-amber-400' : energy > 20 ? 'bg-orange-500' : 'bg-rose-500'
                     }`}
-                  >
-                    {DIFFICULTIES[lvl].label} ({DIFFICULTIES[lvl].durationSec}s)
-                  </button>
-                ))}
+                    style={{ width: `${Math.round(energy)}%` }}
+                  />
+                </div>
               </div>
+
+              {/* Oxygen Bar */}
+              <div className="rounded-xl border border-[#462A72] bg-[#160A29] px-3 py-2">
+                <div className="flex items-center justify-between text-xs font-bold">
+                  <span className="flex items-center gap-1 text-sky-300">
+                    <Wind className="h-4 w-4" /> Oxygen
+                  </span>
+                  <span className="font-mono-tabular text-white">{Math.round(oxygen)}%</span>
+                </div>
+                <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-900">
+                  <div
+                    className="h-full bg-sky-400 transition-all"
+                    style={{ width: `${Math.round(oxygen)}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Quick Rover Cleaner Button */}
+              <button
+                type="button"
+                disabled={roverBusy}
+                onClick={handleRoverClean}
+                className="flex items-center justify-center gap-2 rounded-xl border-2 border-sky-300 bg-sky-500/25 px-3 py-2 text-xs font-bold text-white hover:bg-sky-500/35 active:scale-95 transition-transform disabled:opacity-50"
+              >
+                <Sun className="h-4 w-4 text-amber-300 shrink-0" />
+                <span>
+                  {roverBusy ? 'Rover cleaning...' : `Clean Panels (${solarDust}% dust)`}
+                </span>
+              </button>
+            </div>
+
+            {/* Interactive Base Defense Arena */}
+            <MarsStormCanvas
+              destination={isMoon ? 'moon' : 'mars'}
+              commander={save.commander}
+              structures={structures}
+              targetedId={targetedId}
+              solarFlareActive={isMoon && timerSec > 10}
+              roverPosPct={roverPosPct}
+              roverActive={roverBusy}
+              lastHitFeedback={lastHitFeedback}
+              reducedStimuli={save.settings.reducedStimuli}
+              onStructureClick={handleStructureClick}
+            />
+
+            {/* Bottom Live Shield & ASTRO Status Strip */}
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#462A72] bg-[#21103A] px-4 py-2.5">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <AstroCompanion mood={astroDialogue?.mood ?? 'alert'} showCaptions={false} size={40} />
+                <p className="text-xs sm:text-sm font-medium text-purple-100 truncate sm:whitespace-normal">
+                  {astroDialogue?.text ??
+                    `Active shields: ${activeShields} (each shield uses energy — turn off when safe!)`}
+                </p>
+              </div>
+              <div className="flex items-center gap-3 text-xs font-bold shrink-0">
+                <span className="text-emerald-300">Blocks: {blockedCount}</span>
+                <span aria-hidden="true">·</span>
+                <span className="text-amber-300 font-mono-tabular">{score} pts</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {phase === 'RESULTS' && (
+          <section
+            className={`mx-auto my-auto w-full max-w-2xl rounded-3xl border-2 bg-[#24123F] p-6 sm:p-8 text-center shadow-2xl ${
+              missionPassed ? 'border-emerald-400/70' : 'border-rose-400/70'
+            }`}
+          >
+            <div className="flex items-end justify-center gap-4">
+              <CommanderSprite profile={save.commander} size={86} isCelebrating={missionPassed} />
+              <AstroCompanion mood={missionPassed ? 'happy' : 'alert'} showCaptions={false} size={64} />
+            </div>
+
+            <h2 className="mt-4 font-display text-2xl sm:text-3xl font-bold text-white">
+              {missionPassed
+                ? `${destinationLabel} Base Saved!`
+                : failReason === 'energy'
+                  ? 'Energy Depleted!'
+                  : 'Oxygen Depleted!'}
+            </h2>
+            <p className="mt-1.5 text-sm text-purple-100/90">
+              {missionPassed
+                ? 'You managed shields, the rover, and power like a true Commander!'
+                : 'Turn off shields when there is no danger and use the Rover to clean the panels.'}
+            </p>
+
+            <div className="mt-5 grid grid-cols-3 gap-3 text-xs">
+              <div className="rounded-xl border border-[#462A72] bg-[#190B2E] p-3">
+                <div className="text-purple-200/80">Final Energy</div>
+                <div className="mt-1 font-mono-tabular text-xl font-bold text-amber-300">
+                  {Math.round(energy)}%
+                </div>
+              </div>
+              <div className="rounded-xl border border-[#462A72] bg-[#190B2E] p-3">
+                <div className="text-purple-200/80">Blocks</div>
+                <div className="mt-1 font-mono-tabular text-xl font-bold text-emerald-300">
+                  {blockedCount}
+                </div>
+              </div>
+              <div className="rounded-xl border border-[#462A72] bg-[#190B2E] p-3">
+                <div className="text-purple-200/80">Score</div>
+                <div className="mt-1 font-mono-tabular text-xl font-bold text-sky-300 flex items-center justify-center gap-1">
+                  <Trophy className="h-4 w-4 text-amber-300" />
+                  {score}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={startDefense}
+                className="inline-flex h-11 items-center gap-2 rounded-xl border border-[#543487] bg-[#2D174D] px-4 text-xs font-bold text-white hover:border-amber-300"
+              >
+                <RotateCcw className="h-4 w-4" />
+                <span>Play Again</span>
+              </button>
 
               <button
                 type="button"
-                onClick={() => startMission(difficulty)}
-                className="mt-5 inline-flex h-13 items-center gap-2.5 rounded-full border-2 border-white border-b-4 bg-gradient-to-b from-[#FDE047] to-[#EAB308] px-8 text-base font-extrabold text-slate-950 shadow-xl transition-transform hover:scale-105"
+                onClick={() => {
+                  soundEngine.playClick();
+                  setRoute('CAMPAIGN_MAP');
+                }}
+                className="inline-flex h-11 items-center gap-2 rounded-xl border border-[#543487] bg-[#2D174D] px-4 text-xs font-bold text-white hover:border-sky-300"
               >
-                <Play className="h-5 w-5" />
-                <span>START MISSION</span>
+                <span>Map</span>
               </button>
 
-              <div className="mt-3 flex items-center gap-1.5 text-[11px] text-sky-200/85">
-                <Info className="h-3.5 w-3.5 shrink-0" />
-                <span>Educational simulation · MERRA-2 analyzes aerosols on Earth, not Mars.</span>
-              </div>
-            </div>
-          )}
-
-          {/* RANDOM EVENT MODAL OVERLAY */}
-          {status === 'PLAYING' && activeEvent && (
-            <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-[#160A29]/75 p-4 backdrop-blur-[2px]">
-              <div className="w-full max-w-md animate-bounce-once rounded-3xl border-2 border-amber-300 bg-[#251142] p-5 text-center shadow-2xl">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-500/25 text-rose-300">
-                  <AlertTriangle className="h-7 w-7 animate-pulse" />
-                </div>
-                <h2 className="mt-2 font-display text-xl font-bold text-white">
-                  {activeEvent.title}
-                </h2>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {[activeEvent.optionA, activeEvent.optionB].map((opt, idx) => (
-                    <button
-                      key={opt.label}
-                      type="button"
-                      onClick={() => handleEventChoice(opt)}
-                      className={`flex flex-col items-center justify-center rounded-2xl border-2 p-3.5 text-center transition-transform hover:scale-105 ${
-                        idx === 0
-                          ? 'border-emerald-400 bg-emerald-500/20 text-white'
-                          : 'border-sky-400 bg-sky-500/20 text-white'
-                      }`}
-                    >
-                      <span className="text-sm font-extrabold">{opt.label}</span>
-                      <span className="mt-1 text-xs font-semibold text-amber-200">
-                        {opt.effectHint}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* VICTORY OVERLAY */}
-          {status === 'WON' && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-[#160A29]/82 p-5 text-center backdrop-blur-[2px]">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400 bg-emerald-500/25 px-4 py-1 text-xs font-bold text-emerald-200">
-                <Trophy className="h-4 w-4 text-amber-300" />
-                <span>COMMANDER MEDAL</span>
-              </div>
-              <h2 className="mt-2 font-display text-3xl font-bold text-emerald-300">
-                Base Safe!
-              </h2>
-              <p className="mt-1 text-sm text-purple-100">
-                The storm passed and you kept the entire crew protected!
-              </p>
-
-              <div className="mt-3 flex items-center gap-4 rounded-2xl border border-amber-300/60 bg-[#21103A] px-5 py-2.5">
-                <div className="flex items-center gap-1.5 text-amber-300">
-                  <Award className="h-6 w-6" />
-                  <span className="font-mono-tabular text-xl font-extrabold text-white">
-                    {sim.score} pts
-                  </span>
-                </div>
-                <span className="text-xs font-bold text-sky-300">{cfg.label}</span>
-              </div>
-
-              <div className="mt-4 flex flex-wrap justify-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => startMission(difficulty)}
-                  className="inline-flex h-11 items-center gap-1.5 rounded-full border-2 border-[#543487] bg-[#2D174D] px-5 text-xs font-bold text-white hover:border-amber-300"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  <span>PLAY AGAIN</span>
-                </button>
-
-                {difficulty < 3 && (
-                  <button
-                    type="button"
-                    onClick={() => startMission((difficulty + 1) as DifficultyLevel)}
-                    className="inline-flex h-11 items-center gap-1.5 rounded-full border-2 border-emerald-300 bg-emerald-500 px-5 text-xs font-extrabold text-slate-950 hover:scale-105 transition-transform"
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    <span>LEVEL {difficulty + 1}</span>
-                  </button>
-                )}
-
+              {missionPassed && (
                 <button
                   type="button"
                   onClick={() => {
                     soundEngine.playClick();
-                    setRoute('CAMPAIGN_MAP');
-                  }}
-                  className="h-11 rounded-full border-2 border-[#543487] bg-[#2D174D] px-5 text-xs font-bold text-purple-100 hover:border-sky-300"
-                >
-                  BACK TO ASTROBASE
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    soundEngine.playSuccess();
                     setRoute('MISSION_3');
                   }}
-                  className="inline-flex h-11 items-center gap-1.5 rounded-full border-2 border-white border-b-4 bg-gradient-to-b from-[#FDE047] to-[#EAB308] px-5 text-xs font-extrabold text-slate-950 hover:scale-105 transition-transform"
+                  className="inline-flex h-11 items-center gap-2 rounded-full border-2 border-white border-b-4 bg-gradient-to-b from-[#FDE047] to-[#EAB308] px-6 text-xs font-bold text-slate-950 shadow-lg hover:scale-105 transition-transform"
                 >
-                  <span>MISSION 3</span>
+                  <span>Mission 3</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
-              </div>
+              )}
             </div>
-          )}
-
-          {/* LOSS OVERLAY */}
-          {status === 'LOST' && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-[#160A29]/88 p-5 text-center backdrop-blur-[2px]">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/25 text-rose-400">
-                <ShieldAlert className="h-8 w-8" />
-              </div>
-              <h2 className="mt-2 font-display text-3xl font-bold text-rose-300">
-                Mission Failed!
-              </h2>
-              <p className="mt-1 text-sm font-semibold text-white">{sim.lossReason}</p>
-              <div className="mt-2 font-mono-tabular text-sm font-bold text-amber-300">
-                Score: {sim.score} pts
-              </div>
-
-              <div className="mt-5 flex flex-wrap justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => startMission(difficulty)}
-                  className="inline-flex h-12 items-center gap-2 rounded-full border-2 border-white border-b-4 bg-gradient-to-b from-[#FDE047] to-[#EAB308] px-6 text-sm font-extrabold text-slate-950 shadow-lg hover:scale-105 transition-transform"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  <span>PLAY AGAIN</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    soundEngine.playClick();
-                    setRoute('CAMPAIGN_MAP');
-                  }}
-                  className="h-12 rounded-full border-2 border-[#543487] bg-[#2D174D] px-6 text-sm font-bold text-purple-100 hover:border-sky-300"
-                >
-                  BACK TO ASTROBASE
-                </button>
-              </div>
-            </div>
-          )}
-        </section>
-
-        {/* 3 BIG ACTION BUTTONS */}
-        <section
-          aria-label="Base Actions"
-          className="grid gap-3 sm:grid-cols-3"
-        >
-          {/* 1. Poupar energia */}
-          <button
-            type="button"
-            disabled={status !== 'PLAYING' || activeEvent !== null}
-            onClick={handleTogglePowerSaving}
-            className={`flex items-center gap-3 rounded-2xl border-2 border-b-4 p-4 text-left transition-all disabled:opacity-50 ${
-              sim.powerSaving
-                ? 'border-sky-300 bg-gradient-to-b from-sky-500/35 to-sky-700/35 shadow-lg scale-[1.01]'
-                : 'border-[#543487] bg-[#21103A] hover:border-sky-400'
-            }`}
-          >
-            <div
-              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
-                sim.powerSaving ? 'bg-sky-400 text-slate-950' : 'bg-[#160A29] text-sky-300'
-              }`}
-            >
-              <Zap className="h-7 w-7" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="font-display text-base font-bold text-white">
-                Save energy
-              </div>
-              <div className="text-xs font-semibold text-sky-200">
-                {sim.powerSaving ? 'Active · Lower drain' : 'Turn off extras'}
-              </div>
-            </div>
-          </button>
-
-          {/* 2. Activar baterias */}
-          <button
-            type="button"
-            disabled={status !== 'PLAYING' || activeEvent !== null}
-            onClick={handleToggleBatteries}
-            className={`flex items-center gap-3 rounded-2xl border-2 border-b-4 p-4 text-left transition-all disabled:opacity-50 ${
-              sim.batteriesActive
-                ? 'border-emerald-300 bg-gradient-to-b from-emerald-500/35 to-emerald-700/35 shadow-lg scale-[1.01]'
-                : 'border-[#543487] bg-[#21103A] hover:border-emerald-400'
-            }`}
-          >
-            <div
-              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
-                sim.batteriesActive ? 'bg-emerald-400 text-slate-950' : 'bg-[#160A29] text-emerald-300'
-              }`}
-            >
-              <BatteryCharging className="h-7 w-7" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-display text-base font-bold text-white">
-                  Activate batteries
-                </span>
-                <span className="font-mono-tabular text-xs font-bold text-emerald-300">
-                  {Math.round(sim.batteryCharge)}%
-                </span>
-              </div>
-              <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-800">
-                <div
-                  className="h-full rounded-full bg-emerald-400 transition-all"
-                  style={{ width: `${sim.batteryCharge}%` }}
-                />
-              </div>
-            </div>
-          </button>
-
-          {/* 3. Limpar painéis solares */}
-          <button
-            type="button"
-            disabled={status !== 'PLAYING' || activeEvent !== null || sim.roverCleaning}
-            onClick={handleCleanPanels}
-            className={`flex items-center gap-3 rounded-2xl border-2 border-b-4 p-4 text-left transition-all disabled:opacity-60 ${
-              sim.roverCleaning
-                ? 'border-amber-300 bg-amber-500/25'
-                : 'border-[#543487] bg-[#21103A] hover:border-amber-300'
-            }`}
-          >
-            <div
-              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
-                sim.roverCleaning ? 'bg-amber-400 text-slate-950' : 'bg-[#160A29] text-amber-300'
-              }`}
-            >
-              <Bot className="h-7 w-7" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-display text-base font-bold text-white">
-                  Clean solar panels
-                </span>
-              </div>
-              <div className="text-xs font-semibold text-amber-200">
-                {sim.roverCleaning
-                  ? `Rover cleaning (${Math.round(sim.roverProgress * 100)}%)`
-                  : `Dust: ${Math.round(sim.dustLevel)}% · -7% Energy`}
-              </div>
-            </div>
-          </button>
-        </section>
-
-        {/* Quiet 1-line scientific accuracy footer */}
-        <footer className="text-center text-[11px] text-purple-200/75">
-          Educational simulation on Mars · Real MERRA-2 data observes aerosols in Earth's atmosphere.
-        </footer>
+          </section>
+        )}
       </main>
+
+      {/* Mid-Wave Crisis Modal */}
+      {crisisModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true">
+          <div className="w-full max-w-md rounded-3xl border-2 border-amber-300 bg-[#22103D] p-6 shadow-2xl text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-400/20 text-amber-300">
+              <AlertTriangle className="h-7 w-7" />
+            </div>
+            <h2 className="mt-3 font-display text-xl font-bold text-white">
+              {isMoon ? 'Peak Radiation Spike!' : 'Giant Dust Gust!'}
+            </h2>
+            <p className="mt-1 text-xs text-purple-200">
+              Quickly choose the base strategy:
+            </p>
+
+            <div className="mt-5 grid gap-3">
+              <button
+                type="button"
+                onClick={() => handleCrisisChoice('all-shield')}
+                className="rounded-2xl border-2 border-sky-400 bg-sky-500/20 p-3.5 text-left hover:bg-sky-500/30 transition-colors"
+              >
+                <div className="text-sm font-bold text-white">Shield Everything</div>
+                <div className="text-xs text-sky-200">-15% Energy · Protects every module!</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleCrisisChoice('save-power')}
+                className="rounded-2xl border-2 border-amber-400 bg-amber-500/20 p-3.5 text-left hover:bg-amber-500/30 transition-colors"
+              >
+                <div className="text-sm font-bold text-white">Save Energy for the End</div>
+                <div className="text-xs text-amber-200">+20% Energy · Sensors will get damaged!</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <DiscoveryCodexModal open={codexOpen} onClose={() => setCodexOpen(false)} />
     </div>

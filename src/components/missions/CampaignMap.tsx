@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Award, BookOpen, CheckCircle2, Compass, GraduationCap, Home, Lock, Play, RotateCcw, Shirt, X } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
-import { BADGE_CATALOG, CAMPAIGN_MISSIONS } from '../../data/scientificData';
+import { getBadgeCatalog, getCampaignMissions } from '../../data/planetaryData';
 import { soundEngine } from '../../utils/soundEngine';
 import { AstroCompanion } from '../engine/AstroCompanion';
 import { CommanderSprite } from '../engine/CommanderSprite';
@@ -16,6 +16,8 @@ export const CampaignMap: React.FC = () => {
   const commanderName = save.commander.commanderName || 'Nova';
   const isMoon = save.selectedDestination === 'moon';
   const destinationName = isMoon ? 'Moon' : 'Mars';
+  const missions = getCampaignMissions(isMoon ? 'moon' : 'mars');
+  const badges = getBadgeCatalog(isMoon ? 'moon' : 'mars');
 
   useEffect(() => {
     if (allCompleted && !save.hasSeenFinalVictory) {
@@ -23,7 +25,7 @@ export const CampaignMap: React.FC = () => {
       setCertificateOpen(true);
       markFinalVictorySeen();
       sayAstro(
-        `Congratulations, Commander ${commanderName}, you successfully completed all missions!`,
+        `Congratulations, Commander ${commanderName}, you completed the missions successfully!`,
         'happy',
         6500
       );
@@ -33,7 +35,7 @@ export const CampaignMap: React.FC = () => {
   const handleLockedClick = (missionNumber: number, title: string) => {
     soundEngine.playGentleError();
     sayAstro(
-      `Mission ${missionNumber} (${title}) arrives in the next phase of construction!`,
+      `Mission ${missionNumber} (${title}) arrives in the next building phase!`,
       'encourage',
       4500
     );
@@ -100,7 +102,7 @@ export const CampaignMap: React.FC = () => {
             className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#543487] bg-[#2D174D] px-3 text-xs font-semibold text-white hover:border-emerald-400 whitespace-nowrap"
           >
             <BookOpen className="h-4 w-4 text-emerald-400" />
-            <span>Logbook ({save.discoveries.length})</span>
+            <span>Journal ({save.discoveries.length})</span>
           </button>
         </div>
       </header>
@@ -119,7 +121,7 @@ export const CampaignMap: React.FC = () => {
             <div>
               <h1 className="font-display text-2xl font-bold text-white sm:text-3xl">
                 {allCompleted
-                  ? `Congratulations, Commander ${commanderName}, you completed the missions!`
+                  ? `Congratulations, Commander ${commanderName}, you completed the missions successfully!`
                   : 'Expedition Map'}
               </h1>
               <p className="mt-1 text-sm text-purple-200/85">
@@ -136,9 +138,9 @@ export const CampaignMap: React.FC = () => {
               caption={
                 astroDialogue?.text ??
                 (allCompleted
-                  ? `Congratulations, Commander ${commanderName}, you completed the missions!`
+                  ? `Congratulations, Commander ${commanderName}, you completed the missions successfully!`
                   : save.completedMissions.length > 0
-                    ? `You've already completed ${save.completedMissions.length}/5 missions on ${isMoon ? 'the Moon' : 'Mars'}! Which one shall we explore next?`
+                    ? `You've already completed ${save.completedMissions.length}/5 missions on ${isMoon ? 'the Moon' : 'Mars'}! Which one should we explore next?`
                     : `Mission 1 is ready on ${isMoon ? 'the Moon' : 'Mars'}! Let's head into the lab.`)
               }
               showCaptions={save.settings.captionsEnabled}
@@ -150,7 +152,7 @@ export const CampaignMap: React.FC = () => {
                 onClick={() => {
                   soundEngine.playSuccess();
                   sayAstro(
-                    `Congratulations, Commander ${commanderName}, you completed the missions!`,
+                    `Congratulations, Commander ${commanderName}, you completed the missions successfully!`,
                     'happy',
                     6500
                   );
@@ -167,7 +169,7 @@ export const CampaignMap: React.FC = () => {
 
         {/* 5-Mission Orbital Trail */}
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {CAMPAIGN_MISSIONS.map((m) => {
+          {missions.map((m) => {
             const isDone = save.completedMissions.includes(m.id);
             return (
               <article
@@ -285,7 +287,7 @@ export const CampaignMap: React.FC = () => {
               Missions Completed · Space Base Commander
             </div>
             <h2 className="mt-2 font-display text-2xl font-extrabold text-white sm:text-3xl">
-              Congratulations, Commander {commanderName}, you completed the missions!
+              Congratulations, Commander {commanderName}, you completed the missions successfully!
             </h2>
 
             <div className="my-5 flex items-end justify-center gap-6">
@@ -302,11 +304,11 @@ export const CampaignMap: React.FC = () => {
               {save.commander.teamName}
             </div>
             <p className="mt-2 text-xs text-purple-100/90">
-              You explored {isMoon ? 'the Moon' : 'Mars'}, mastered scientific sensors, protected the space base, built stable structures, collected water and ice, and grew crops in the space greenhouse.
+              You explored {isMoon ? 'the Moon' : 'Mars'}, mastered scientific sensors, protected the space base, built stable structures, extracted space ice, and analyzed regolith to establish the base.
             </p>
 
             <div className="mt-5 flex flex-wrap justify-center gap-2">
-              {BADGE_CATALOG.map((b) => (
+              {badges.map((b) => (
                 <div
                   key={b.id}
                   className="inline-flex items-center gap-1.5 rounded-lg border border-amber-400/50 bg-amber-400/15 px-3 py-1.5 text-xs font-bold text-amber-200"

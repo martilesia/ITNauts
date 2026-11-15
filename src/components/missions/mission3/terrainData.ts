@@ -117,7 +117,7 @@ export const ZONE_META: Record<
     bg: '#92400E',
     border: '#451A03',
     text: '#FEF3C7',
-    shortDesc: 'Mountain blocked',
+    shortDesc: 'Blocked mountain',
   },
 };
 
@@ -175,14 +175,14 @@ export const BASE_CANDIDATES: BaseCandidate[] = [
     bonusScore: 150,
     feedbackTitle: 'Excellent Choice!',
     feedbackText:
-      'Site A is flat and easy to reach with the rover. Structures stay level and energy usage is low!',
+      'Site A is flat and easy to reach with the rover. Structures stay level and energy consumption is low!',
     coord: { col: 10, row: 3 },
   },
   {
     id: 'B',
     name: 'Site B — Gentle Slope',
     subtitle: 'Moderately sloped terrain',
-    slopeLabel: 'Medium (12°)',
+    slopeLabel: 'Moderate (12°)',
     slopeDegrees: 12,
     elevationVar: 'Medium (±25 m)',
     accessibility: 'Moderate',
@@ -191,7 +191,7 @@ export const BASE_CANDIDATES: BaseCandidate[] = [
     bonusScore: 50,
     feedbackTitle: 'Risky Site!',
     feedbackText:
-      'Site B is closer, but it has a medium slope. The base would need extra leveling so it does not tilt!',
+      'Site B is closer, but has a moderate slope. The base would need extra leveling so it does not sit crooked!',
     coord: { col: 4, row: 1 },
   },
   {
@@ -207,7 +207,7 @@ export const BASE_CANDIDATES: BaseCandidate[] = [
     bonusScore: 0,
     feedbackTitle: 'Unsuitable Site!',
     feedbackText:
-      'Site C has large height differences and a steep slope. Modules could tip over and the rover would use a lot of battery!',
+      'Site C has big elevation changes and a steep slope. Modules could tip over and the rover would use too much battery!',
     coord: { col: 10, row: 6 },
   },
 ];

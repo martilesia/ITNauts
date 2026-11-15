@@ -38,8 +38,8 @@ export const PlanetaryBackdrop: React.FC<PlanetaryBackdropProps> = ({
         : marsSurfaceImg;
 
   const altText = isMoon
-    ? 'Lunar surface with craters, rocks, and relief'
-    : 'Martian surface with craters, dunes, rocks, and slopes';
+    ? 'Lunar surface with craters, rocks, and terrain relief'
+    : 'Martian surface with craters, dunes, rocks, and elevation changes';
 
   // Subtle 2.5D camera parallax shift when Commander explores
   const panX = !reducedStimuli && cameraFocus ? (50 - cameraFocus.x) * 0.08 : 0;

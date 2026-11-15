@@ -186,7 +186,7 @@ export const TitleScreen: React.FC = () => {
               }}
               className="mt-5 h-12 rounded-full border-2 border-white bg-gradient-to-b from-[#38BDF8] to-[#0284C7] px-6 font-display text-base font-bold text-white shadow-lg hover:scale-105 transition-transform"
             >
-              Back to Title Screen
+              Back to Home Screen
             </button>
           </div>
         )}

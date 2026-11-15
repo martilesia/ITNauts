@@ -187,7 +187,7 @@ export const WelcomeRoom: React.FC = () => {
           phase === 'guiding'
             ? nearDoor
               ? '[E] Enter Room'
-              : 'Walk over here →'
+              : 'Walk here →'
             : 'Door Closed',
         active: exitDoorOpen,
         near: nearDoor,
@@ -297,7 +297,7 @@ export const WelcomeRoom: React.FC = () => {
                 <p className="text-sm font-semibold text-white">
                   {phase === 'introduced'
                     ? `"Hello, Commander ${commanderName}! I'm ASTRO, your space assistant!"`
-                    : '"Come with me to the door! Let\'s choose our next exploration destination."'}
+                    : '"Come with me to the door! Let’s choose our next exploration destination."'}
                 </p>
               </div>
 

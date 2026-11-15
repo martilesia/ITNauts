@@ -1,0 +1,800 @@
+# PROMPT — RECONSTRUÇÃO DAS MISSÕES 1, 2, 4 E 5 DO SPACE BASE COMMANDER
+
+## 1. PAPEL E RESPONSABILIDADE
+
+Actua como um **Especialista Sénior em Desenvolvimento de Jogos, Game Design, Game-Based Learning, UI/UX Design, Engenharia de Software e Ciência Planetária**, com experiência em desenvolvimento de jogos educativos utilizando React, Vite, JavaScript e Tailwind CSS.
+
+Estou a desenvolver o **SPACE BASE COMMANDER**, um jogo educativo de exploração espacial destinado principalmente a crianças dos 7 aos 12 anos, no âmbito do NASA Space Apps Challenge.
+
+A tua tarefa é analisar o projecto existente e **recriar integralmente as experiências, os cenários, as actividades e as mecânicas das Missões 1, 2, 4 e 5**, corrigindo a falta de coerência científica e narrativa que existe actualmente.
+
+Não quero apenas pequenas alterações visuais. Quero que as missões sejam repensadas para que façam sentido dentro de uma verdadeira aventura de exploração espacial.
+
+**A Missão 3 — Terrain Explorer — está perfeita e deve permanecer exactamente como está. Não a alteres.**
+
+---
+
+# 2. PROBLEMA QUE PRECISAMOS DE RESOLVER
+
+Actualmente, algumas missões apresentam cenários e actividades relacionados com o planeta Terra, mesmo quando o jogador já escolheu explorar a Lua ou Marte.
+
+Por exemplo:
+- Aparecem mapas terrestres em missões que deveriam decorrer na Lua ou em Marte.
+- São apresentados dados de precipitação, humidade do solo e outras características da Terra como se fossem aplicáveis directamente ao destino espacial.
+- Algumas actividades não têm ligação lógica com o ambiente onde o astronauta se encontra.
+- As missões parecem experiências isoladas, em vez de capítulos de uma única aventura espacial.
+
+Isto precisa de ser corrigido.
+
+O princípio fundamental é:
+
+**Se o jogador escolheu a Lua, todas as missões devem apresentar cenários, ambientes, fenómenos, actividades e informações cientificamente coerentes com a Lua.**
+
+**Se o jogador escolheu Marte, todas as missões devem apresentar cenários, ambientes, fenómenos, actividades e informações cientificamente coerentes com Marte.**
+
+A experiência deve adaptar-se automaticamente ao destino seleccionado anteriormente.
+
+Não cries novamente a selecção do destino. Essa funcionalidade já existe.
+
+---
+
+# 3. FONTE DE INFORMAÇÃO CIENTÍFICA — CONSULTA OBRIGATÓRIA
+
+Utiliza a seguinte aplicação como fonte de pesquisa para obter informações e dados relacionados com a Lua e Marte:
+
+https://ai.studio/apps/6776205d-9173-439d-93ae-00b244bf583f
+
+**É obrigatório consultar e analisar esta aplicação antes de desenhar as novas missões.**
+
+A tua primeira tarefa deve ser:
+
+1. Abrir a aplicação através do link fornecido.
+2. Compreender que informações, dados científicos, imagens, características planetárias e recursos relacionados com a Lua e Marte estão disponíveis.
+3. Identificar os dados que podem ser utilizados nas diferentes missões.
+4. Distinguir claramente os dados relacionados com a Lua dos dados relacionados com Marte.
+5. Identificar as possibilidades de utilização desses dados na criação de cenários e actividades educativas.
+6. Verificar se os dados são reais, simulados, ilustrativos ou apenas descritivos.
+7. Registar a origem e a natureza de cada informação utilizada.
+
+Se a aplicação permitir consultar ou obter dados, aproveita os recursos disponíveis. Se não for possível aceder a alguma informação, identifica essa limitação e procura uma fonte científica alternativa e fiável.
+
+**Não inventes dados científicos nem atribuas à NASA informações que não foram efectivamente obtidas de uma fonte verificável.**
+
+Sempre que utilizares dados científicos, procura identificar:
+- Nome do conjunto de dados.
+- Missão ou instrumento responsável pela recolha.
+- Corpo celeste observado.
+- Tipo de informação fornecida.
+- Unidade de medida, quando aplicável.
+- Origem e referência da informação.
+
+Podes recorrer a fontes científicas da NASA e de outras instituições espaciais reconhecidas, desde que sejam adequadas ao fenómeno estudado.
+
+Exemplos de referências científicas que podem ser investigadas, conforme a necessidade de cada missão:
+
+**Para a Lua:**
+- LOLA — Lunar Orbiter Laser Altimeter: topografia e elevação lunar.
+- Diviner Lunar Radiometer: propriedades térmicas da superfície lunar.
+- LROC — Lunar Reconnaissance Orbiter Camera: imagens e características da superfície lunar.
+- Dados científicos relacionados com a presença de gelo e possíveis recursos de água nas regiões polares lunares.
+
+**Para Marte:**
+- MOLA — Mars Orbiter Laser Altimeter: topografia e elevação de Marte.
+- THEMIS — Thermal Emission Imaging System: características térmicas e minerais da superfície.
+- HiRISE — imagens de elevada resolução da superfície marciana.
+- Dados científicos relacionados com gelo subterrâneo, depósitos de água congelada e características do regolito marciano.
+
+Estes são exemplos de fontes a investigar, não uma lista obrigatória de integração. Escolhe os conjuntos de dados que realmente correspondam às actividades de cada missão.
+
+Se a integração directa com os dados científicos não for possível nesta versão, utiliza simulações educativas claramente identificadas. As simulações devem respeitar as características conhecidas do corpo celeste.
+
+---
+
+# 4. SISTEMA DE ADAPTAÇÃO AO DESTINO
+
+Este é um dos requisitos técnicos e funcionais mais importantes.
+
+O jogo já possui um processo em que o jogador:
+1. Personaliza ou escolhe o traje espacial.
+2. Escolhe o destino da expedição: Lua ou Marte.
+3. Inicia a aventura.
+
+Deves aproveitar as escolhas já guardadas no estado do jogo.
+
+Não cries outro selector de destino, não reinicies a experiência e não peças novamente ao jogador para escolher o planeta.
+
+Implementa ou adapta a lógica de forma a que as missões recebam automaticamente o destino seleccionado.
+
+A estrutura conceptual deverá ser semelhante a:
+
+```javascript
+const destination = playerData.destination;
+
+// A missão utiliza o destino já escolhido.
+if (destination === "moon") {
+  // Cenário, dados e actividades lunares.
+}
+
+if (destination === "mars") {
+  // Cenário, dados e actividades marcianas.
+}
+```
+
+O código acima é apenas ilustrativo. Respeita a arquitectura e as convenções reais do projecto.
+
+## 4.1. Quando o destino for a Lua
+
+O ambiente visual deve representar a superfície lunar.
+
+Utiliza características como:
+- Superfície cinzenta e rochosa.
+- Rególito lunar.
+- Crateras de diferentes dimensões.
+- Montanhas e planícies lunares.
+- Grandes contrastes de iluminação.
+- Céu negro, sem uma atmosfera semelhante à terrestre.
+- Terra visível no céu quando a localização e o enquadramento permitirem.
+- Equipamentos, habitats e veículos adequados à exploração lunar.
+
+Não apresentes:
+- Oceanos ou rios.
+- Florestas ou vegetação.
+- Chuva ou precipitação atmosférica.
+- Nuvens e meteorologia terrestre.
+- Solo agrícola.
+- Paisagens terrestres.
+
+Quando abordares água, utiliza o contexto científico apropriado, como a investigação de possíveis depósitos de gelo nas regiões permanentemente sombreadas, sem afirmar que toda a Lua contém água disponível.
+
+## 4.2. Quando o destino for Marte
+
+O ambiente visual deve representar a superfície marciana.
+
+Utiliza características como:
+- Paisagens em tons avermelhados, alaranjados e castanhos.
+- Rególito marciano.
+- Rochas e crateras.
+- Vales e formações geológicas.
+- Montanhas e planícies.
+- Céu marciano com tonalidades apropriadas.
+- Poeira suspensa na atmosfera.
+- Equipamentos e veículos de exploração marciana.
+
+Não apresentes:
+- Florestas ou vegetação terrestre.
+- Oceanos terrestres.
+- Chuvas terrestres.
+- Paisagens tropicais.
+- Mapas terrestres como se fossem mapas de Marte.
+
+Quando abordares água, considera o contexto de gelo, possíveis depósitos subterrâneos e minerais hidratados, respeitando as evidências científicas disponíveis.
+
+## 4.3. Regras para todos os cenários
+
+A adaptação não deve limitar-se ao fundo da interface.
+
+Deve afectar:
+- Cenário completo.
+- Texturas do terreno.
+- Céu e iluminação.
+- Elementos geológicos.
+- Objectos e equipamentos.
+- Animações ambientais.
+- Fenómenos naturais.
+- Actividades e desafios.
+- Informações apresentadas por ASTRO.
+- Sons e efeitos ambientais, quando disponíveis.
+
+A criança deve conseguir perceber visualmente que está a explorar um mundo diferente.
+
+---
+
+# 5. RECRIAÇÃO DAS MISSÕES
+
+Recria as Missões 1, 2, 4 e 5, mantendo a identidade e a finalidade educativa geral do projecto, mas adaptando as experiências ao destino seleccionado.
+
+Não quero que todas as missões sejam simples painéis de informação ou questionários.
+
+Cada missão deve funcionar como uma aventura interactiva, com exploração, objectivos, ferramentas, decisões, consequências e aprendizagem.
+
+## MISSÃO 1 — O CHAMAMENTO ESPACIAL
+
+### Objectivo da missão
+
+Preparar o jovem astronauta para a sua primeira exploração, apresentando-lhe o ambiente do destino escolhido e ensinando-lhe a importância da observação científica antes de realizar actividades na superfície.
+
+### Nova abordagem
+
+A missão deve deixar de ser um laboratório de observação da Terra.
+
+O jogador já escolheu a Lua ou Marte. Por isso, a missão deve decorrer num centro de preparação espacial que apresenta uma simulação científica do destino escolhido.
+
+ASTRO recebe o astronauta e explica que a equipa precisa de analisar o ambiente antes de iniciar a exploração.
+
+O jogador deve participar na preparação da expedição.
+
+### Se o destino for a Lua
+
+Criar um cenário de preparação para uma missão lunar.
+
+Actividades possíveis:
+- Explorar uma representação interactiva da superfície lunar.
+- Observar crateras, planícies e regiões montanhosas.
+- Activar instrumentos de observação.
+- Investigar as características térmicas de diferentes regiões.
+- Descobrir como a iluminação e as sombras influenciam a exploração.
+- Identificar regiões que merecem investigação científica.
+- Analisar as condições de uma possível zona de instalação da base.
+
+Utiliza dados e informações científicas adequados à Lua.
+
+A actividade deve ensinar que a superfície lunar apresenta diferentes características geológicas e condições ambientais que influenciam a exploração.
+
+### Se o destino for Marte
+
+Criar um cenário de preparação para uma missão marciana.
+
+Actividades possíveis:
+- Explorar uma representação interactiva da superfície de Marte.
+- Observar crateras, vales, planícies e formações rochosas.
+- Investigar características da atmosfera marciana.
+- Observar a distribuição de poeira.
+- Analisar características térmicas de diferentes regiões.
+- Identificar locais que merecem investigação científica.
+- Analisar as condições de uma possível zona de instalação da base.
+
+Utiliza dados e informações científicas adequados a Marte.
+
+A actividade deve ensinar que Marte possui uma atmosfera muito fina, uma superfície geologicamente diversificada e condições ambientais que influenciam a exploração.
+
+### Mecânicas obrigatórias
+
+- O jogador deve movimentar-se pelo ambiente.
+- ASTRO deve acompanhar e orientar o jogador.
+- Deve ser possível interagir com instrumentos e objectos.
+- As observações devem produzir resultados visuais.
+- O jogador deve tomar decisões que influenciem a preparação da expedição.
+- Os resultados devem contribuir para o progresso da missão.
+
+Não transformes esta missão num conjunto de perguntas sobre características dos planetas.
+
+**O jogador deve descobrir essas características através da exploração e da utilização de instrumentos científicos.**
+
+---
+
+## MISSÃO 2 — OPERAÇÃO: RED STORM
+
+### Objectivo da missão
+
+Criar uma experiência de sobrevivência e protecção da base espacial perante condições ambientais adversas no destino seleccionado.
+
+Mantém a ideia de gestão de recursos, preparação de equipamentos, protecção da base e consequências das decisões.
+
+Contudo, a missão deve ser cientificamente adaptada ao destino.
+
+### Se o destino for Marte
+
+<text>**Operação: Red Storm — Tempestade de Poeira Marciana**</text>
+
+Criar um cenário de uma base instalada na superfície de Marte.
+
+Uma tempestade de poeira aproxima-se da região e a equipa precisa de proteger a base e os seus equipamentos.
+
+O jogador deve:
+- Explorar a base marciana.
+- Identificar equipamentos expostos.
+- Inspeccionar os painéis solares.
+- Proteger instrumentos científicos.
+- Verificar os sistemas de energia.
+- Preparar os módulos habitacionais.
+- Gerir a energia disponível.
+- Tomar decisões sobre a protecção dos equipamentos.
+- Reparar sistemas afectados pelas condições ambientais simuladas.
+
+As actividades devem ensinar:
+- Como a poeira marciana pode afectar os equipamentos.
+- Como a acumulação de poeira pode reduzir a eficiência dos painéis solares.
+- Porque é importante proteger os instrumentos científicos.
+- Como a gestão de energia é essencial numa base espacial.
+- Porque a preparação antecipada reduz os riscos operacionais.
+
+A tempestade deve ser representada através de animações ambientais, redução de visibilidade e acumulação visual de poeira.
+
+As consequências das decisões devem ser visíveis.
+
+### Se o destino for a Lua
+
+**Não cries uma tempestade atmosférica lunar.**
+
+A Lua praticamente não possui uma atmosfera capaz de produzir fenómenos meteorológicos como as tempestades de poeira de Marte.
+
+Em vez disso, adapta a missão para:
+
+**Operação: Lunar Shield — Protecção da Base Lunar**
+
+Criar uma situação de preparação e protecção da base perante riscos ambientais lunares.
+
+Possíveis elementos:
+- Rególito lunar fino e abrasivo.
+- Poeira lunar que pode aderir a superfícies e equipamentos devido às suas propriedades electrostáticas.
+- Exposição directa à radiação solar.
+- Grandes variações térmicas entre condições de iluminação e sombra.
+- Risco de danos em equipamentos expostos.
+- Necessidade de proteger instrumentos e sistemas de suporte.
+
+O jogador deve:
+- Inspeccionar o exterior da base.
+- Identificar equipamentos expostos.
+- Preparar sistemas de protecção.
+- Verificar o isolamento térmico.
+- Proteger mecanismos sensíveis contra a poeira lunar.
+- Gerir a energia disponível.
+- Preparar a base para condições ambientais adversas.
+- Reparar equipamentos quando necessário.
+
+Não representes estes fenómenos como uma tempestade atmosférica. Utiliza uma simulação visual adequada às condições lunares.
+
+### Mecânicas obrigatórias para ambas as versões
+
+- Gestão de energia.
+- Gestão de recursos.
+- Inspecção de equipamentos.
+- Interacção com estruturas da base.
+- Sistema de preparação e protecção.
+- Decisões com consequências positivas ou negativas.
+- Animações que demonstrem os efeitos das condições ambientais.
+- ASTRO como assistente durante a operação.
+- Relatório final calculado a partir das acções do jogador.
+
+A missão deve ser emocionante e transmitir a sensação de que o jogador está a proteger uma verdadeira base espacial.
+
+---
+
+## MISSÃO 4 — RECRIAR A MISSÃO DE ÁGUA E RECURSOS HÍDRICOS
+
+### Problema actual
+
+A missão Rainfall Explorer utiliza dados de precipitação terrestre, incluindo o produto NASA GPM `GPM_3IMERGM`.
+
+Esses dados não representam precipitação na Lua ou em Marte.
+
+A missão não deve continuar a apresentar mapas de chuva da Terra como se fossem informações sobre o destino espacial.
+
+### Nova abordagem
+
+Transforma a missão numa experiência de investigação de recursos de água no corpo celeste escolhido.
+
+O nome da missão pode ser adaptado para cada destino, mantendo o padrão de nomenclatura e apresentação já utilizado no jogo.
+
+### Se o destino for a Lua
+
+Criar uma missão de investigação de possíveis recursos de água lunar.
+
+Possíveis actividades:
+- Explorar uma região lunar com diferentes condições de iluminação.
+- Identificar crateras e regiões permanentemente sombreadas.
+- Utilizar um instrumento científico para investigar possíveis sinais associados à presença de gelo.
+- Comparar regiões com diferentes características.
+- Identificar zonas que merecem investigação adicional.
+- Avaliar a importância dos possíveis recursos de água para uma futura base lunar.
+
+O jogador deve compreender:
+- Porque os cientistas investigam a presença de água na Lua.
+- O que são regiões permanentemente sombreadas.
+- Porque o gelo lunar é importante para futuras missões.
+- Porque não se pode afirmar que toda a região observada contém água acessível.
+- Porque a detecção de possíveis sinais de água não significa que exista um reservatório pronto a utilizar.
+
+### Se o destino for Marte
+
+Criar uma missão de investigação de recursos hídricos marcianos.
+
+Possíveis actividades:
+- Explorar diferentes regiões da superfície marciana.
+- Investigar possíveis depósitos de gelo subterrâneo.
+- Observar características geológicas associadas à presença passada ou actual de água.
+- Analisar informações científicas sobre minerais hidratados.
+- Comparar diferentes regiões.
+- Identificar zonas com potencial interesse para investigação de recursos hídricos.
+
+O jogador deve compreender:
+- Que Marte apresenta evidências de água no seu passado geológico.
+- Que existe água sob a forma de gelo em determinadas regiões.
+- Que a água pode estar presente em depósitos subterrâneos.
+- Que a presença de gelo ou minerais hidratados não significa disponibilidade imediata de água para consumo.
+- Porque a localização dos recursos é importante para o planeamento de uma base.
+
+### Mecânicas obrigatórias
+
+- Cenário planetário correspondente ao destino.
+- Exploração de regiões.
+- Utilização de instrumentos de detecção.
+- Visualização de resultados científicos.
+- Comparação de locais.
+- Descoberta de possíveis recursos.
+- Decisões sobre a escolha de regiões para investigação.
+- Consequências das decisões.
+- Feedback visual e educativo.
+
+**Não utilizar chuva, rios, oceanos ou mapas de precipitação terrestre como mecânica central desta missão.**
+
+A actividade deve ser sobre a investigação de água e recursos hídricos no destino seleccionado.
+
+---
+
+## MISSÃO 5 — RECRIAR A MISSÃO DE HUMIDADE DO SOLO
+
+### Problema actual
+
+A missão Soil Explorer utiliza dados do satélite SMAP, que estuda a humidade do solo na Terra.
+
+Os valores de humidade terrestre não podem ser apresentados como medições da superfície lunar ou marciana.
+
+É necessário substituir o conceito de humidade do solo por uma experiência científica adequada ao ambiente espacial.
+
+### Nova abordagem
+
+Transforma a missão numa actividade de investigação das propriedades do material superficial do destino.
+
+O jogador deve compreender que a superfície lunar e a superfície marciana possuem materiais e características diferentes, e que os cientistas precisam de os investigar antes de planear uma base.
+
+### Se o destino for a Lua
+
+Criar uma missão de investigação do **Rególito Lunar**.
+
+O jogador deve:
+- Explorar diferentes zonas da superfície lunar.
+- Recolher amostras simuladas de rególito.
+- Utilizar instrumentos científicos para analisar as amostras.
+- Descobrir características do material superficial.
+- Identificar diferenças entre materiais e regiões.
+- Investigar a importância do rególito para a construção e operação de uma base lunar.
+
+A aprendizagem deve incluir:
+- O que é o rególito lunar.
+- Porque a superfície lunar é coberta por materiais fragmentados.
+- Como a poeira lunar pode afectar equipamentos.
+- Porque os cientistas estudam as propriedades do material superficial.
+- Como a caracterização dos materiais pode ajudar a planear futuras instalações.
+
+### Se o destino for Marte
+
+Criar uma missão de investigação do **Rególito Marciano**.
+
+O jogador deve:
+- Explorar diferentes zonas da superfície marciana.
+- Recolher amostras simuladas.
+- Utilizar instrumentos científicos para analisar as amostras.
+- Investigar características dos materiais superficiais.
+- Descobrir diferenças entre regiões.
+- Investigar a importância dos materiais locais para a exploração e instalação de uma base.
+
+A aprendizagem deve incluir:
+- O que é o rególito marciano.
+- Como os materiais superficiais podem variar entre regiões.
+- A importância da composição mineralógica.
+- A existência de minerais que podem fornecer informações sobre a história geológica e a presença passada de água.
+- Porque é necessário estudar os materiais antes de planear a utilização de recursos locais.
+
+### Mecânicas obrigatórias
+
+- Cenário planetário adequado.
+- Exploração do ambiente.
+- Recolha de amostras.
+- Utilização de instrumentos científicos.
+- Análise visual das amostras.
+- Descoberta de características dos materiais.
+- Comparação de resultados.
+- Decisões com consequências.
+- ASTRO como assistente científico.
+- Sistema de pontuação ou recompensa baseado nas actividades realizadas.
+
+Não apresentes valores de humidade do SMAP como dados lunares ou marcianos.
+
+Não inventes percentagens de composição química ou mineralógica e não as apresentes como medições reais.
+
+Se utilizares valores simulados para a jogabilidade, identifica-os claramente como simulações educativas.
+
+---
+
+# 6. APRENDIZAGEM ATRAVÉS DA JOGABILIDADE
+
+Este requisito é obrigatório para todas as missões.
+
+O jogo destina-se a crianças dos 7 aos 12 anos. Por isso, não quero missões compostas principalmente por textos, explicações, cartões informativos ou perguntas de escolha múltipla.
+
+A criança deve aprender enquanto joga.
+
+Cada actividade deve possuir:
+
+1. Um objectivo de aprendizagem.
+2. Uma situação ou problema dentro do cenário.
+3. Uma acção que o jogador deve executar.
+4. Uma ou mais decisões.
+5. Uma consequência visível.
+6. Uma explicação curta e contextualizada.
+7. Uma oportunidade de aplicar o que aprendeu.
+
+Exemplo:
+
+O jogador precisa de instalar um equipamento numa região lunar.
+
+Pode escolher uma zona com iluminação adequada ou uma região permanentemente sombreada.
+
+A escolha deve produzir consequências na simulação. ASTRO pode explicar brevemente como a iluminação afecta o funcionamento do equipamento.
+
+O objectivo não é apresentar uma pergunta e mostrar a resposta correcta. É permitir que a criança experimente e compreenda a consequência da sua decisão.
+
+## Regras pedagógicas
+
+- Cada actividade deve ensinar alguma coisa.
+- Cada decisão importante deve ter consequências.
+- Os erros devem proporcionar oportunidades de aprendizagem.
+- Não utilizar punições excessivas.
+- Permitir experimentar estratégias diferentes.
+- Não apresentar grandes blocos de texto.
+- Utilizar animações, reacções dos personagens e alterações no ambiente.
+- ASTRO deve explicar apenas o necessário, no momento certo.
+- A criança deve descobrir os conceitos através da exploração.
+
+As consequências podem afectar:
+- Energia.
+- Recursos.
+- Estado dos equipamentos.
+- Estado das estruturas.
+- Progresso da missão.
+- Amostras recolhidas.
+- Qualidade das decisões científicas.
+
+O jogo deve guardar as decisões relevantes para que possam influenciar fases posteriores, sempre que existir uma ligação lógica.
+
+---
+
+# 7. IDENTIDADE VISUAL E HARMONIA ENTRE AS MISSÕES
+
+Embora as missões tenham cenários diferentes, todas devem parecer partes do mesmo jogo.
+
+**Não quero que cada missão pareça ter sido desenvolvida por uma equipa diferente.**
+
+Antes de implementar, analisa cuidadosamente a interface actual do SPACE BASE COMMANDER.
+
+Identifica:
+- Paleta de cores.
+- Tipografia.
+- Estilo dos botões.
+- Estilo dos cartões e painéis.
+- Formato dos ícones.
+- Estilo dos personagens.
+- Aparência do astronauta.
+- Aparência do ASTRO.
+- Animações e transições.
+- Barras de progresso.
+- Elementos de navegação.
+- Sistema de recompensas.
+
+Preserva esses padrões.
+
+Podes alterar os cenários, as paisagens, os objectos e as animações específicas de cada missão, mas mantém a identidade visual geral.
+
+### Consistência obrigatória
+
+- O astronauta deve manter a personalização escolhida anteriormente.
+- ASTRO deve manter a mesma identidade visual e personalidade.
+- Os botões devem seguir o mesmo padrão.
+- Os painéis devem ter a mesma linguagem visual.
+- As transições devem ser coerentes.
+- Os indicadores de progresso devem manter o mesmo estilo.
+- Os resultados das missões devem seguir uma estrutura consistente.
+
+O cenário planetário deve mudar de acordo com o destino, mas a interface do jogo deve continuar reconhecível.
+
+---
+
+# 8. REQUISITOS TÉCNICOS E ARQUITECTURA
+
+Antes de escrever código, analisa a estrutura real do projecto.
+
+Não cries um novo projecto nem uma aplicação independente.
+
+Não substituas a aplicação actual.
+
+Não alteres funcionalidades que não estejam relacionadas com as missões solicitadas.
+
+Identifica:
+- Onde estão implementadas as Missões 1, 2, 3, 4 e 5.
+- Como é feita a navegação.
+- Onde é armazenada a escolha do destino.
+- Como é armazenada a personalização do astronauta.
+- Como funciona o sistema de progresso.
+- Como são geridos os estados das missões.
+- Quais os componentes visuais reutilizáveis.
+
+Utiliza a arquitectura existente sempre que possível.
+
+Se necessário, cria componentes reutilizáveis para:
+- Cenários lunares.
+- Cenários marcianos.
+- Instrumentos científicos.
+- Interacções com objectos.
+- Recolha de amostras.
+- Análise de dados.
+- Consequências das decisões.
+- Feedback de ASTRO.
+- Progresso e recompensas.
+
+Organiza os dados de cada destino de forma clara, evitando duplicar código desnecessariamente.
+
+A lógica de adaptação deve ser centralizada sempre que possível.
+
+Não introduzas dependências desnecessárias.
+
+Todos os botões e elementos interactivos devem funcionar.
+
+Não substituas mecânicas reais por imagens estáticas.
+
+---
+
+# 9. REGRAS ABSOLUTAS — O QUE NÃO DEVE SER ALTERADO
+
+Estas regras são obrigatórias:
+
+1. **NÃO ALTERAR A MISSÃO 3 — TERRAIN EXPLORER.**
+
+2. Não modificar a estrutura, os componentes, o cenário, as mecânicas, a jogabilidade, a interface ou o código da Missão 3.
+
+3. Não criar novamente a escolha do traje.
+
+4. Não criar novamente a escolha do destino.
+
+5. Não reiniciar o progresso já existente.
+
+6. Não alterar a página inicial ou o fluxo principal do jogo.
+
+7. Não criar uma aplicação independente.
+
+8. Não utilizar dados da Terra como se fossem medições da Lua ou de Marte.
+
+9. Não criar fenómenos naturais incompatíveis com o corpo celeste.
+
+10. Não inventar dados científicos.
+
+11. Não transformar as missões em apresentações com muito texto.
+
+12. Não criar apenas interfaces visuais sem mecânicas funcionais.
+
+13. Não utilizar botões decorativos sem acção.
+
+14. Não remover funcionalidades existentes que não estejam relacionadas com a correcção solicitada.
+
+15. Não introduzir alterações desnecessárias noutras partes do projecto.
+
+Se for necessário alterar um componente partilhado que também seja utilizado pela Missão 3, verifica cuidadosamente o impacto antes de o modificar. A Missão 3 deve permanecer inalterada no comportamento e na apresentação.
+
+---
+
+# 10. PROCESSO DE TRABALHO OBRIGATÓRIO
+
+Não comeces imediatamente a substituir o código.
+
+Segue estas fases:
+
+### FASE 1 — ANÁLISE DO PROJECTO
+
+Analisa a arquitectura e identifica como as cinco missões estão implementadas.
+
+Confirma como o destino escolhido é guardado e transmitido.
+
+Identifica os componentes partilhados e os elementos responsáveis pela identidade visual.
+
+### FASE 2 — INVESTIGAÇÃO CIENTÍFICA
+
+Consulta obrigatoriamente o link fornecido.
+
+Identifica os dados disponíveis sobre a Lua e Marte.
+
+Determina quais as informações adequadas para cada missão.
+
+Não assumas que todos os dados necessários estão disponíveis.
+
+### FASE 3 — NOVO PLANEAMENTO DAS MISSÕES
+
+Antes de programar, apresenta uma proposta organizada contendo:
+
+- Nome da missão.
+- Objectivo narrativo.
+- Objectivo educativo.
+- Cenário para a Lua.
+- Cenário para Marte.
+- Actividades interactivas.
+- Dados científicos utilizados.
+- Decisões do jogador.
+- Consequências.
+- Papel de ASTRO.
+- Resultado esperado.
+
+Apresenta as diferenças entre as duas versões de cada missão.
+
+A Missão 3 deve aparecer apenas como uma missão preservada, sem proposta de alteração.
+
+### FASE 4 — IMPLEMENTAÇÃO
+
+Depois de apresentar o plano, implementa as alterações no projecto existente.
+
+Trabalha uma missão de cada vez.
+
+Ordem recomendada:
+
+1. Missão 1 — O Chamamento Espacial.
+2. Missão 2 — Operação: Red Storm / Lunar Shield.
+3. Missão 4 — Investigação de Recursos Hídricos.
+4. Missão 5 — Explorador do Rególito.
+
+Mantém a integração com o sistema de navegação e progressão existente.
+
+### FASE 5 — TESTES
+
+Testa as duas possibilidades de destino.
+
+**Teste A — Expedição à Lua**
+- Escolher a Lua antes de iniciar as missões.
+- Verificar se a Missão 1 apresenta o cenário lunar.
+- Verificar se a Missão 2 apresenta a operação de protecção lunar, sem tempestade atmosférica.
+- Verificar se a Missão 4 investiga recursos hídricos lunares.
+- Verificar se a Missão 5 investiga o rególito lunar.
+- Confirmar que não aparecem dados terrestres apresentados como dados lunares.
+
+**Teste B — Expedição a Marte**
+- Escolher Marte antes de iniciar as missões.
+- Verificar se a Missão 1 apresenta o cenário marciano.
+- Verificar se a Missão 2 apresenta a tempestade de poeira marciana.
+- Verificar se a Missão 4 investiga recursos hídricos marcianos.
+- Verificar se a Missão 5 investiga o rególito marciano.
+- Confirmar que não aparecem dados terrestres apresentados como dados marcianos.
+
+**Teste C — Integridade do jogo**
+- Confirmar que a personalização do astronauta é preservada.
+- Confirmar que ASTRO mantém a sua identidade.
+- Confirmar que a navegação funciona.
+- Confirmar que o progresso é guardado correctamente.
+- Confirmar que as recompensas continuam a funcionar.
+- Confirmar que a Missão 3 permanece exactamente como estava.
+- Verificar a responsividade.
+- Verificar erros na consola.
+- Verificar que não existem botões sem funcionalidade.
+
+Corrige os problemas identificados antes de concluir.
+
+---
+
+# 11. RESULTADO FINAL ESPERADO
+
+Quero que o SPACE BASE COMMANDER ofereça uma experiência de exploração espacial verdadeiramente coerente.
+
+A criança deve sentir que está a explorar um mundo real, com características próprias, e que as missões estão directamente relacionadas com o ambiente onde se encontra.
+
+Quando escolhe a Lua, deve viver uma aventura lunar.
+
+Quando escolhe Marte, deve viver uma aventura marciana.
+
+As missões devem apresentar:
+- Cenários visualmente coerentes.
+- Actividades cientificamente fundamentadas.
+- Exploração interactiva.
+- Utilização de instrumentos.
+- Recolha e análise de informação.
+- Decisões com consequências.
+- Aprendizagem através da experimentação.
+- Continuidade narrativa.
+- Harmonia visual com o restante jogo.
+
+**Não quero apenas mudar as imagens de fundo. Quero que os cenários, os desafios, as actividades e os fenómenos estudados sejam efectivamente diferentes conforme o destino escolhido.**
+
+## PRINCÍPIO FUNDAMENTAL
+
+**Um único jogo, duas experiências de exploração espacial: Lua e Marte.**
+
+A arquitectura, a identidade visual, o astronauta, ASTRO e a progressão devem permanecer consistentes. O mundo explorado, os fenómenos estudados e as actividades científicas devem adaptar-se ao destino.
+
+A Missão 3 permanece intocada.
+
+O resultado deve ser um jogo educativo, interactivo, divertido, cientificamente coerente e adequado a crianças dos 7 aos 12 anos.
